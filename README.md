@@ -1185,7 +1185,7 @@ The results of the `time()` function call would be the same for all of the follo
 <c-time />
 ```
 
-If you're component's internal execution needs to remain dynamic you *should not* use the attribute cache. Because the Dagger compiler inlines components, performance should remain relatively stable in this scenarios, even for heavily-used components.
+If you're component's internal execution needs to remain dynamic you *should not* use the attribute cache. Because the Dagger compiler inlines components, performance should remain relatively stable in these scenarios, even for heavily-used components.
 
 ## Static Template Optimizations
 
