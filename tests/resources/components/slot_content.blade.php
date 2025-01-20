@@ -1,0 +1,1 @@
+Content {{ $slot ?? 'No Slot' }}

@@ -1,0 +1,1 @@
+<c-slot_forwarding.component_g #id="theComponent" />

@@ -1,0 +1,1 @@
+@if ($slots->hasSlot('footer')) Yes @else No @endif

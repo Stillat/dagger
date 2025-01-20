@@ -1,0 +1,1 @@
+<button>{{ $slots->buttonText }}</button>

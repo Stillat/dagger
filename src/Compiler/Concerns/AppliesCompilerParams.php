@@ -1,0 +1,56 @@
+<?php
+
+namespace Stillat\Dagger\Compiler\Concerns;
+
+use Stillat\BladeParser\Nodes\Components\ParameterNode;
+use Stillat\BladeParser\Nodes\Components\ParameterType;
+use Stillat\Dagger\Compiler\ComponentState;
+use Stillat\Dagger\Exceptions\InvalidCompilerParameterException;
+
+trait AppliesCompilerParams
+{
+    protected array $invalidCompilerParamTypes = [
+        ParameterType::DynamicVariable,
+        ParameterType::ShorthandDynamicVariable,
+        ParameterType::InterpolatedValue,
+        ParameterType::AttributeEcho,
+        ParameterType::AttributeRawEcho,
+    ];
+
+    protected function isValidCompilerParam(ParameterNode $param): bool
+    {
+        if (in_array($param->type, $this->invalidCompilerParamTypes, true)) {
+            return false;
+        }
+
+        if (str_starts_with($param->value, '{') && str_ends_with($param->value, '}')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws InvalidCompilerParameterException
+     */
+    protected function applyCompilerParameters(ComponentState $component, array $compilerParams): void
+    {
+        if (count($compilerParams) === 0) {
+            return;
+        }
+
+        $compilerParams = collect($compilerParams)
+            ->mapWithKeys(function (ParameterNode $param) {
+                if (! $this->isValidCompilerParam($param)) {
+                    throw new InvalidCompilerParameterException;
+                }
+
+                return [mb_substr($param->name, 1) => $param->value];
+            })->all();
+
+        if (array_key_exists('id', $compilerParams)) {
+            $component->compilerId = '#'.$compilerParams['id'];
+            $component->hasUserSuppliedId = true;
+        }
+    }
+}

@@ -1,0 +1,1 @@
+Before. {{ $slots->header->attributes }}{{ $slots->header }} After.
