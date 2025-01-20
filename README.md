@@ -307,7 +307,7 @@ You may specify content for each slot like so:
 
 ### Custom PHP When Using the Component Function
 
-While the functional syntax may be more verbose in this example, there are other features not provided by directives that can only be used with the component builder; we will cover these additional features later. When using the functional syntax, it is important to note that any PHP code that appears *before* the `component()` call will be removed from the compiled output:
+When using the functional syntax, it is important to note that any PHP code that appears *before* the `component()` call will be removed from the compiled output:
 
 ```blade
 @php
