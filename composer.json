@@ -1,5 +1,6 @@
 {
     "name": "stillat/dagger",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Stillat\\Dagger\\": "src"
