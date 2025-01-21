@@ -561,11 +561,15 @@ PHP;
 
         if ($this->isRoot()) {
             $this->stencilPlaceholders = [];
-            $this->componentBlocks = [];
-            $this->replacementManager->clear();
         }
 
         return $compiled;
+    }
+
+    public function cleanup(): void
+    {
+        $this->componentBlocks = [];
+        $this->replacementManager->clear();
     }
 
     protected function compileVariableCleanup(array $variables): string
