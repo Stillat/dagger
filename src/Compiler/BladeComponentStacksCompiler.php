@@ -15,6 +15,7 @@ class BladeComponentStacksCompiler
     {
         $nlStyle = Utils::getNewlineStyle($template);
         $lines = explode($nlStyle, $template);
+        $newLines = [];
 
         $componentRenderedTemplate = <<<'PHP'
 <?php $varName = true; ?>
@@ -24,17 +25,22 @@ PHP;
 <?php if (isset($varName) && $varName === true) { \Stillat\Dagger\Facades\ComponentEnv::pop(null); unset($varName); } ?>
 PHP;
 
-        $transformedLines = collect($lines)->map(function ($line) use (
-            $componentRenderedTemplate,
-            $checkRenderedTemplate
-        ) {
+        for ($i = 0; $i < count($lines); $i++) {
+            $line = $lines[$i];
             $trimmedLine = trim($line);
 
             if (Str::startsWith($trimmedLine, '##BEGIN-COMPONENT-CLASS##')) {
-                return implode(PHP_EOL, [
-                    $line,
-                    '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>',
-                ]);
+                while (! str_starts_with($trimmedLine, '<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>')) {
+                    $newLines[] = $line;
+                    $i++;
+
+                    $line = $lines[$i];
+                    $trimmedLine = trim($line);
+                }
+                $newLines[] = '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>';
+                $newLines[] = $line;
+
+                continue;
             }
 
             if (str_ends_with($trimmedLine, '##END-COMPONENT-CLASS##')) {
@@ -42,16 +48,18 @@ PHP;
                 $componentRendered = Str::swap(['varName' => $varName], $componentRenderedTemplate);
                 $checkRendered = Str::swap(['varName' => $varName], $checkRenderedTemplate);
 
-                return implode(PHP_EOL, [
+                $newLines[] = implode(PHP_EOL, [
                     $componentRendered,
                     $line,
                     $checkRendered,
                 ]);
+
+                continue;
             }
 
-            return $line;
-        });
+            $newLines[] = $line;
+        }
 
-        return $transformedLines->implode($nlStyle);
+        return implode($nlStyle, $newLines);
     }
 }

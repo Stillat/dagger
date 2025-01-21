@@ -1,0 +1,3 @@
+@aware(['title' => 'Nope'])
+
+{{ $title }}
