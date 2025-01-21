@@ -3,55 +3,19 @@
 namespace Stillat\Dagger\Compiler;
 
 use Illuminate\Support\Str;
-use Illuminate\View\Compilers\BladeCompiler;
-use ReflectionMethod;
-use ReflectionProperty;
 use Stillat\Dagger\Support\Utils;
 
 class BladeComponentStacksCompiler
 {
-    protected ReflectionProperty $componentHashStackProxy;
-
-    protected ReflectionMethod $compileComponentProxy;
-
-    protected ReflectionMethod $compileEndComponentProxy;
-
-    protected BladeCompiler $compiler;
-
-    public function __construct(BladeCompiler $bladeCompiler)
+    /**
+     * Injects logic into Blade's component output to
+     * push components to a custom component stack.
+     */
+    public function compile(string $template): string
     {
-        $this->compiler = $bladeCompiler;
-
-        $compilerReflection = new \ReflectionClass(BladeCompiler::class);
-        $this->componentHashStackProxy = $compilerReflection->getProperty('componentHashStack');
-        $this->componentHashStackProxy->setAccessible(true);
-        $this->compileComponentProxy = new ReflectionMethod(BladeCompiler::class, 'compileComponent');
-        $this->compileEndComponentProxy = new ReflectionMethod(BladeCompiler::class, 'compileEndComponent');
-    }
-
-    protected function popComponentHash()
-    {
-        $currentValue = $this->componentHashStackProxy->getValue();
-
-        $hash = array_pop($currentValue);
-
-        $this->componentHashStackProxy->setValue(null, $currentValue);
-
-        return $hash;
-    }
-
-    public function compileComponent($expression)
-    {
-        return implode(PHP_EOL, [
-            $this->compileComponentProxy->invoke($this->compiler, $expression),
-            PHP_EOL,
-            '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>',
-        ]);
-    }
-
-    public function compileEndComponentClass($expression)
-    {
-        $hash = $this->popComponentHash();
+        $nlStyle = Utils::getNewlineStyle($template);
+        $lines = explode($nlStyle, $template);
+        $newLines = [];
 
         $componentRenderedTemplate = <<<'PHP'
 <?php $varName = true; ?>
@@ -61,26 +25,41 @@ PHP;
 <?php if (isset($varName) && $varName === true) { \Stillat\Dagger\Facades\ComponentEnv::pop(null); unset($varName); } ?>
 PHP;
 
-        $varName = '__didComponentRender'.Utils::makeRandomString();
-        $componentRendered = Str::swap(['varName' => $varName], $componentRenderedTemplate);
-        $checkRendered = Str::swap(['varName' => $varName], $checkRenderedTemplate);
+        for ($i = 0; $i < count($lines); $i++) {
+            $line = $lines[$i];
+            $trimmedLine = trim($line);
 
-        $bladeEndComponentClass = $this->compileEndComponentProxy->invoke($this->compiler, $expression)."\n".implode("\n", [
-            '<?php endif; ?>',
-            '<?php if (isset($__attributesOriginal'.$hash.')): ?>',
-            '<?php $attributes = $__attributesOriginal'.$hash.'; ?>',
-            '<?php unset($__attributesOriginal'.$hash.'); ?>',
-            '<?php endif; ?>',
-            '<?php if (isset($__componentOriginal'.$hash.')): ?>',
-            '<?php $component = $__componentOriginal'.$hash.'; ?>',
-            '<?php unset($__componentOriginal'.$hash.'); ?>',
-            '<?php endif; ?>',
-        ]);
+            if (Str::startsWith($trimmedLine, '##BEGIN-COMPONENT-CLASS##')) {
+                while (! str_starts_with($trimmedLine, '<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>')) {
+                    $newLines[] = $line;
+                    $i++;
 
-        return implode(PHP_EOL, [
-            $componentRendered,
-            $bladeEndComponentClass,
-            $checkRendered,
-        ]);
+                    $line = $lines[$i];
+                    $trimmedLine = trim($line);
+                }
+                $newLines[] = '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>';
+                $newLines[] = $line;
+
+                continue;
+            }
+
+            if (str_ends_with($trimmedLine, '##END-COMPONENT-CLASS##')) {
+                $varName = '__didComponentRender'.Utils::makeRandomString();
+                $componentRendered = Str::swap(['varName' => $varName], $componentRenderedTemplate);
+                $checkRendered = Str::swap(['varName' => $varName], $checkRenderedTemplate);
+
+                $newLines[] = implode(PHP_EOL, [
+                    $componentRendered,
+                    $line,
+                    $checkRendered,
+                ]);
+
+                continue;
+            }
+
+            $newLines[] = $line;
+        }
+
+        return implode($nlStyle, $newLines);
     }
 }
