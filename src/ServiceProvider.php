@@ -63,10 +63,18 @@ class ServiceProvider extends IlluminateServiceProvider
             'components',
         );
 
-        $componentStackCompiler = new BladeComponentStacksCompiler;
+        /** @var BladeComponentStacksCompiler $componentStackCompiler */
+        $componentStackCompiler = app(BladeComponentStacksCompiler::class);
+
+        Blade::directive('component', function ($expression) use ($componentStackCompiler) {
+            return $componentStackCompiler->compileComponent($expression);
+        });
+
+        Blade::directive('endComponentClass', function ($expression) use ($componentStackCompiler) {
+            return $componentStackCompiler->compileEndComponentClass($expression);
+        });
 
         Blade::prepareStringsForCompilationUsing(fn ($template) => Compiler::compile($template));
-        Blade::precompiler(fn ($template) => $componentStackCompiler->compile($template));
     }
 
     protected function bootEvents()
