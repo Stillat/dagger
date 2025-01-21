@@ -484,6 +484,7 @@ $__componentData['slots'] = $__slotContainerVarSuffix;
 if ($__slotContainerVarSuffix->hasDefaultSlotContent()) { $__componentData['slot'] = $__slotContainerVarSuffix->getDefaultContent(); }
 
 (function () use ($__tmpVars, $__componentData) {
+$slot = \Stillat\Dagger\Runtime\SlotContainer::getEmptySlot();
 extract($__tmpVars);extract($componentVarName->getMacros());extract($__componentData);extract($componentVarName->data->toArray());
 ?>#inner#<?php
 })();
