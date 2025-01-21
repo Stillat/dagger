@@ -16,6 +16,7 @@ use Stillat\Dagger\Compiler\TemplateCompiler;
  * @method static bool compiledDynamicComponentExists(string $proxyName, string $componentName)
  * @method static void compileDynamicComponent(array $proxyDetails, string $componentName)
  * @method static CompilerOptions getOptions()
+ * @method static cleanup()
  */
 class Compiler extends Facade
 {

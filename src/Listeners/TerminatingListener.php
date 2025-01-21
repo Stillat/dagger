@@ -2,6 +2,7 @@
 
 namespace Stillat\Dagger\Listeners;
 
+use Stillat\Dagger\Facades\Compiler;
 use Stillat\Dagger\Runtime\ViewManifest;
 
 class TerminatingListener
@@ -15,6 +16,8 @@ class TerminatingListener
 
     public function handle()
     {
+        Compiler::cleanup();
+
         foreach ($this->manifest->getTracked() as $rootView => $tracked) {
             file_put_contents(
                 $this->manifest->getStoragePath($rootView),

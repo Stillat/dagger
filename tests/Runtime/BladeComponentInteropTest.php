@@ -65,3 +65,83 @@ BLADE;
         $this->render('<x-component_a title="The Title" /> <x-component_f />')
     );
 });
+
+test('Dagger components inside Blade slot content', function () {
+    $template = <<<'BLADE'
+<x-parent_with_slot>
+    <c-basic title="The Title" />
+</x-parent_with_slot>
+
+<c-basic title="Another Title" />
+BLADE;
+
+    $expected = <<<'EXPECTED'
+<div id="theParent">
+    The Title
+</div>
+
+
+Another Title
+EXPECTED;
+
+    $this->assertSame(
+        $expected,
+        $this->render($template)
+    );
+});
+
+test('stencils inside Blade slot content', function () {
+    $template = <<<'BLADE'
+<x-parent_with_slot>
+<c-stencils.basic>
+    <c-stencil:the_name>
+        Some changed content!
+    </c-stencil:the_name>
+</c-stencils.basic>
+</x-parent_with_slot>
+
+<c-stencils.basic />
+
+<c-stencils.basic>
+    <c-stencil:the_name>
+        Some changed content #1
+        <x-parent_with_slot>
+        <c-stencils.basic>
+            <c-stencil:the_name>
+                Some changed content #2
+            </c-stencil:the_name>
+        </c-stencils.basic>
+        </x-parent_with_slot>
+    </c-stencil:the_name>
+</c-stencils.basic>
+
+<c-stencils.basic />
+
+BLADE;
+
+    $expected = <<<'EXPECTED'
+<div id="theParent">
+    Before
+Some changed content!
+After
+</div>
+Before
+The Default.
+After
+Before
+Some changed content #1
+        <div id="theParent">
+    Before
+Some changed content #2
+After
+</div>After
+Before
+The Default.
+After
+EXPECTED;
+
+    $this->assertSame(
+        $expected,
+        $this->render($template)
+    );
+});
