@@ -3,18 +3,55 @@
 namespace Stillat\Dagger\Compiler;
 
 use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
+use ReflectionMethod;
+use ReflectionProperty;
 use Stillat\Dagger\Support\Utils;
 
 class BladeComponentStacksCompiler
 {
-    /**
-     * Injects logic into Blade's component output to
-     * push components to a custom component stack.
-     */
-    public function compile(string $template): string
+    protected ReflectionProperty $componentHashStackProxy;
+
+    protected ReflectionMethod $compileComponentProxy;
+
+    protected ReflectionMethod $compileEndComponentProxy;
+
+    protected BladeCompiler $compiler;
+
+    public function __construct(BladeCompiler $bladeCompiler)
     {
-        $nlStyle = Utils::getNewlineStyle($template);
-        $lines = explode($nlStyle, $template);
+        $this->compiler = $bladeCompiler;
+
+        $compilerReflection = new \ReflectionClass(BladeCompiler::class);
+        $this->componentHashStackProxy = $compilerReflection->getProperty('componentHashStack');
+        $this->componentHashStackProxy->setAccessible(true);
+        $this->compileComponentProxy = new ReflectionMethod(BladeCompiler::class, 'compileComponent');
+        $this->compileEndComponentProxy = new ReflectionMethod(BladeCompiler::class, 'compileEndComponent');
+    }
+
+    protected function popComponentHash()
+    {
+        $currentValue = $this->componentHashStackProxy->getValue();
+
+        $hash = array_pop($currentValue);
+
+        $this->componentHashStackProxy->setValue(null, $currentValue);
+
+        return $hash;
+    }
+
+    public function compileComponent($expression)
+    {
+        return implode(PHP_EOL, [
+            $this->compileComponentProxy->invoke($this->compiler, $expression),
+            PHP_EOL,
+            '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>',
+        ]);
+    }
+
+    public function compileEndComponentClass($expression)
+    {
+        $hash = $this->popComponentHash();
 
         $componentRenderedTemplate = <<<'PHP'
 <?php $varName = true; ?>
@@ -24,34 +61,26 @@ PHP;
 <?php if (isset($varName) && $varName === true) { \Stillat\Dagger\Facades\ComponentEnv::pop(null); unset($varName); } ?>
 PHP;
 
-        $transformedLines = collect($lines)->map(function ($line) use (
-            $componentRenderedTemplate,
-            $checkRenderedTemplate
-        ) {
-            $trimmedLine = trim($line);
+        $varName = '__didComponentRender'.Utils::makeRandomString();
+        $componentRendered = Str::swap(['varName' => $varName], $componentRenderedTemplate);
+        $checkRendered = Str::swap(['varName' => $varName], $checkRenderedTemplate);
 
-            if (Str::startsWith($trimmedLine, '##BEGIN-COMPONENT-CLASS##')) {
-                return implode(PHP_EOL, [
-                    $line,
-                    '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>',
-                ]);
-            }
+        $bladeEndComponentClass = $this->compileEndComponentProxy->invoke($this->compiler, $expression)."\n".implode("\n", [
+            '<?php endif; ?>',
+            '<?php if (isset($__attributesOriginal'.$hash.')): ?>',
+            '<?php $attributes = $__attributesOriginal'.$hash.'; ?>',
+            '<?php unset($__attributesOriginal'.$hash.'); ?>',
+            '<?php endif; ?>',
+            '<?php if (isset($__componentOriginal'.$hash.')): ?>',
+            '<?php $component = $__componentOriginal'.$hash.'; ?>',
+            '<?php unset($__componentOriginal'.$hash.'); ?>',
+            '<?php endif; ?>',
+        ]);
 
-            if (str_ends_with($trimmedLine, '##END-COMPONENT-CLASS##')) {
-                $varName = '__didComponentRender'.Utils::makeRandomString();
-                $componentRendered = Str::swap(['varName' => $varName], $componentRenderedTemplate);
-                $checkRendered = Str::swap(['varName' => $varName], $checkRenderedTemplate);
-
-                return implode(PHP_EOL, [
-                    $componentRendered,
-                    $line,
-                    $checkRendered,
-                ]);
-            }
-
-            return $line;
-        });
-
-        return $transformedLines->implode($nlStyle);
+        return implode(PHP_EOL, [
+            $componentRendered,
+            $bladeEndComponentClass,
+            $checkRendered,
+        ]);
     }
 }
