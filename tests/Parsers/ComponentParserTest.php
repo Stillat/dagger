@@ -189,3 +189,10 @@ BLADE;
     $this->assertSame('42.42', $awareDefaults['propName5']);
     $this->assertSame("['one', 'two', 'three']", $awareDefaults['propName6']);
 });
+
+test('test parser promotes assignments', function () {
+    $this->assertSame(
+        '123',
+        $this->render('<c-component_ast />')
+    );
+});

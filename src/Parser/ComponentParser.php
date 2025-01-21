@@ -8,6 +8,7 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\InlineHTML;
 use PhpParser\Node\Stmt\Nop;
@@ -109,8 +110,14 @@ class ComponentParser
                 continue;
             }
 
-            if ($node instanceof InlineHTML && ! $addedComponentChain) {
+            if ($node instanceof InlineHTML) {
                 $newAst[] = $node;
+            }
+
+            if ($node instanceof Expression && $node->expr instanceof Assign) {
+                if ($node !== $componentChain) {
+                    $newAst[] = $node;
+                }
             }
 
             if (! $node instanceof InlineHTML) {

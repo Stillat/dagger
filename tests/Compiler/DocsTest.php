@@ -41,7 +41,7 @@ EXPECTED;
 test('php removed compiler notes example', function () {
     $expected = <<<'EXPECTED'
 <div class="alert alert-info">
-    Nope
+    the value
 </div>
 EXPECTED;
 

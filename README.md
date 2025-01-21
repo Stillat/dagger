@@ -307,15 +307,18 @@ You may specify content for each slot like so:
 
 ### Custom PHP When Using the Component Function
 
-When using the functional syntax, it is important to note that any PHP code that appears *before* the `component()` call will be removed from the compiled output:
+When using the functional syntax, it is important to note that PHP code that appears *before* the `component()` call may be removed from the compiled output. You can use this space to perform logic at compile time or set variables.
 
 ```blade
 @php
 use function Stillat\Dagger\component;
 
+// Danger zone.
 $myCustomVariable = 'the value';
 
 component()->props(['type' => 'info', 'message']);
+
+// Safe zone.
 @endphp
 
 <div {{ $attributes->merge(['class' => 'alert alert-'.$type]) }}>
@@ -323,7 +326,7 @@ component()->props(['type' => 'info', 'message']);
 </div>
 ```
 
-When the above component is rendered you will receive an error stating the `$myCustomVariable` is not defined. To resolve this, any custom PHP code you'd like to execute should appear after the `component()` call:
+To be safe, any custom PHP code you'd like to execute should appear after the `component()` call:
 
 ```blade
 @php
@@ -339,7 +342,7 @@ $myCustomVariable = 'the value';
 </div>
 ```
 
-This does not apply to `use` statements. Any custom PHP code that appears before the `component()` call will be executed at *compile* time, however.
+This does not apply to `use` statements and variable assignments. Any custom PHP code that appears before the `component()` call will be executed at *compile* time, however.
 
 ### Calling Component Builder Methods
 
