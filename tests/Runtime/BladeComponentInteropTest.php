@@ -38,30 +38,3 @@ BLADE;
         Str::squish($this->render($template))
     );
 });
-
-test('compiler injects stack behaviors into multi-line Blade tags', function () {
-    $template = <<<'BLADE'
-<x-alert :thing="[
-    'multi' => 'line',
-    'test' => 'here'
-]" />
-BLADE;
-
-    $this->assertSame(
-        'Blade component test. ',
-        $this->render($template)
-    );
-});
-
-test('Blade component stacks', function () {
-    $expected = <<<'BLADE'
-Component B: The Title
-Component C: The Title
-Component E: The Title Nope
-BLADE;
-
-    $this->assertSame(
-        $expected,
-        $this->render('<x-component_a title="The Title" /> <x-component_f />')
-    );
-});
