@@ -8,7 +8,18 @@ class SlotContainer
 {
     const DEFAULT_SLOT_KEY = '-default-';
 
+    protected static ?ComponentSlot $emptySlot = null;
+
     protected array $contents = [];
+
+    public static function getEmptySlot(): ComponentSlot
+    {
+        if (static::$emptySlot === null) {
+            static::$emptySlot = new ComponentSlot;
+        }
+
+        return static::$emptySlot;
+    }
 
     public function setSlotContent(string $slotName, string $contents, array $attributes = []): void
     {

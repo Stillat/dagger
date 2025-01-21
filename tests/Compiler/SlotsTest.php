@@ -239,3 +239,7 @@ EXPECTED;
         $this->render($template)
     );
 });
+
+test('default slot value is injected', function () {
+    $this->assertSame('<div></div>', $this->render('<c-empty_slot />'));
+});
