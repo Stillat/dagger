@@ -72,6 +72,7 @@ The main visual difference when working with Dagger components is the use of the
 ## Frequently Asked Questions
 
 - [How does the Dagger compiler differ from Laravel's component compiler?](#how-does-the-dagger-compiler-differ-from-laravels-component-compiler)
+- [Is an additional build step required?](#is-an-additional-build-step-required)
 - [Are class-based components supported?](#are-class-based-components-supported)
 - [Will this magically make my existing Blade components faster?](#will-this-magically-make-my-existing-blade-components-faster)
 - [Can I use regular Blade components with Dagger components?](#can-i-use-regular-blade-components-with-dagger-components)
@@ -82,6 +83,10 @@ The main visual difference when working with Dagger components is the use of the
 ### How does the Dagger compiler differ from Laravel's component compiler?
 
 The Dagger compiler is a multi-stage compiler that recursively parses and compiles a component's template ahead of time. Components compiled with the Dagger compiler will become *part of the view's* compiled output. Because of this, Laravel's related view events will *not* be fired when Dagger components are loaded.
+
+### Is an additional build step required?
+
+An additional build step is *not* required. Dagger components will be compiled the first time you load your views. [Dynamic Components](#dynamic-components) will be compiled automatically the first time they are encountered.
 
 ### Are class-based components supported?
 
