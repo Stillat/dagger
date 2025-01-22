@@ -1,0 +1,28 @@
+# Changelog
+
+## Unreleased
+
+- `@aware` variables are automatically removed from the attribute bag, without needing to redefine them in `@props`
+
+## [v1.0.4](https://github.com/Stillat/dagger/compare/v1.0.3...v1.0.4) - 2025-01-21
+
+- Improves compilation of hyphenated attributes, preventing them from becoming camelCased
+
+## [v1.0.3](https://github.com/Stillat/dagger/compare/v1.0.2...v1.0.3) - 2025-01-21
+
+- Variable assignments are no longer removed from components when they appear before the `component()` builder function call
+- Parity: A default `$slot` variable is now available
+
+## [v1.0.2](https://github.com/Stillat/dagger/compare/v1.0.1...v1.0.2) - 2025-01-21
+
+- Reverts changes from 1.0.1 to prevent overriding core directives, reduce amount of reflection
+- Improves Blade stack injection
+- Corrects an issue where Dagger components may not compile when used inside Blade component slots
+
+## [v1.0.1](https://github.com/Stillat/dagger/compare/v1.0.0...v1.0.1) - 2025-01-21
+
+- Corrects an issue where Blade stack injection would fail when using multi-line attributes
+
+## [v1.0.0](https://github.com/Stillat/dagger/compare/v1.0.0...v1.0.0) - 2025-01-20
+
+- The Beginning
