@@ -39,6 +39,7 @@ The main visual difference when working with Dagger components is the use of the
   - [Using the aware Directive](#using-the-aware-directive)
   - [Using the aware Builder Method](#using-the-aware-builder-method)
   - [Accessing Arbitrary Parent Data](#accessing-arbitrary-parent-data)
+  - [Aware Variables and Attributes](#aware-variables-and-attributes)
 - [Property Validation](#property-validation)
   - [Shorthand Validation Rules](#shorthand-validation-rules)
 - [Compiler Attributes](#compiler-attributes)
@@ -528,6 +529,26 @@ You may also supply the name of the parent component you'd like to retrieve data
 
 ```blade
 {{ $component->parent('nav')->someValue }}
+```
+
+### Aware Variables and Attributes
+
+Aware variables will automatically be added to the component's props list, preventing them from appearing in the attribute bag.
+
+```blade
+<!-- /resources/dagger/views/menu/index.blade.php -->
+@props(['color'])
+
+<ul>
+  {{ $slot}}
+</ul>
+```
+
+```blade
+<!-- /resources/dagger/views/menu/item.blade.php -->
+@aware(['color']) // "color" will be automatically added to the component's props.
+
+<li {{ $attributes }}>{{ $slot }}</li>
 ```
 
 ## Property Validation
