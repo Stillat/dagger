@@ -537,6 +537,11 @@ PHP;
 
             $compiledComponentTemplate = $this->compileCompilerDirectives($compiledComponentTemplate);
 
+            $propNames = array_flip(array_merge(
+                $componentModel->getPropNames(),
+                $componentModel->getAwareVariables(),
+            ));
+
             $swapVars = [
                 '#cachePath#' => $cachePath ?? '',
                 '#sourcePath#' => Utils::normalizePath($sourcePath),
@@ -549,7 +554,7 @@ PHP;
                 'VarSuffix' => $varSuffix,
                 '#componentName#' => $node->tagName,
                 '$dependentVars,' => $this->compileBoundScopeVariables(),
-                '$compiledPropNames' => Str::squish($this->compilePhpArray(array_flip($componentModel->getPropNames()))),
+                '$compiledPropNames' => Str::squish($this->compilePhpArray($propNames)),
                 'componentVarName' => $componentModel->getVariableName(),
                 '$compiledParams' => $compiledComponentParams,
                 '#inner#' => $this->storeComponentBlock($innerContent),
