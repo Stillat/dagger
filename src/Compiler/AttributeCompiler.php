@@ -54,9 +54,9 @@ class AttributeCompiler
         })->implode('');
     }
 
-    public function compile(array $parameters): string
+    public function compile(array $parameters, array $propNames = []): string
     {
-        return '['.implode(',', $this->toCompiledArray($parameters)).']';
+        return '['.implode(',', $this->toCompiledArray($parameters, $propNames)).']';
     }
 
     public function getLastCompiledNames(): array
@@ -91,7 +91,7 @@ class AttributeCompiler
     /**
      * @param  ParameterNode[]  $parameters
      */
-    public function toCompiledArray(array $parameters): array
+    public function toCompiledArray(array $parameters, array $propNames = []): array
     {
         $this->compiledValues = $this->compiledParamNames = [];
 
@@ -105,7 +105,7 @@ class AttributeCompiler
             $paramName = $paramValue = null;
 
             if ($parameter->type == ParameterType::Parameter) {
-                $paramName = Str::camel($parameter->name);
+                $paramName = in_array($parameter->name, $propNames) ? Str::camel($parameter->name) : $parameter->name;
                 $paramValue = $this->arrayValue($parameter->value);
                 $compiledParameters[] = $this->toArraySyntax($paramName, $paramValue);
             } elseif ($parameter->type == ParameterType::DynamicVariable) {

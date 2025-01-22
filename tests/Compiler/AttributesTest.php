@@ -68,3 +68,10 @@ BLADE;
         $this->render($template)
     );
 });
+
+test('hyphenated attributes are not case converted', function () {
+    $this->assertSame(
+        '<div data-thing="the thing">The Title</div>',
+        $this->render('<c-button data-thing="the thing" title="The Title" />')
+    );
+});

@@ -434,7 +434,11 @@ final class TemplateCompiler
 
             $innerTemplate = $this->compileStencils($componentModel, $extractions, $innerTemplate);
 
-            $compiledComponentParams = $this->attributeCompiler->compile($this->filterComponentParams($node->parameters ?? []));
+            $compiledComponentParams = $this->attributeCompiler->compile(
+                $this->filterComponentParams($node->parameters ?? []),
+                $componentModel->getPropNames(),
+            );
+
             $this->activeComponent->compiledComponentAttributes = $this->attributeCompiler->getLastCompiledNames();
 
             $compiledComponentTemplate = <<<'PHP'
