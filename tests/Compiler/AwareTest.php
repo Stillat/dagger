@@ -43,6 +43,8 @@ EXPECTED;
 });
 
 test('aware removes items from the attribute bag when supplied with default values', function () {
+    // Framework Reference: https://github.com/laravel/framework/issues/54276
+
     $template = <<<'BLADE'
 <c-aware_attributes.menu color="purple">
     <c-aware_attributes.menu.item_default>...</c-aware_attributes.menu.item_default>
