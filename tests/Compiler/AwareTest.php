@@ -65,3 +65,38 @@ EXPECTED;
         $this->render($template)
     );
 });
+
+test('aware receives default values from parent components', function () {
+    // Framework Reference: https://github.com/laravel/framework/issues/41076
+
+    $template = <<<'BLADE'
+<c-aware.parent name="Custom Parent Name">
+    <c-aware.child>child1</c-aware.child>
+    <c-aware.child>child2</c-aware.child>
+</c-aware.parent>
+
+<c-aware.parent>
+    <c-aware.child>child1</c-aware.child>
+    <c-aware.child>child2</c-aware.child>
+</c-aware.parent>
+BLADE;
+
+    $expected = <<<'EXPECTED'
+<ul>
+    
+<li>Custom Parent Name has a child1</li>    
+<li>Custom Parent Name has a child2</li>
+</ul>
+
+<ul>
+    
+<li>Default Parent Value has a child1</li>    
+<li>Default Parent Value has a child2</li>
+</ul>
+EXPECTED;
+
+    $this->assertSame(
+        $expected,
+        $this->render($template)
+    );
+});
