@@ -3,6 +3,7 @@
 ## Unreleased
 
 - `@aware` variables are automatically removed from the attribute bag, without needing to redefine them in `@props`
+- Adds support for passing attributes via. the `<c-component {{ $attributes }} />` attribute
 
 ## [v1.0.4](https://github.com/Stillat/dagger/compare/v1.0.3...v1.0.4) - 2025-01-21
 
