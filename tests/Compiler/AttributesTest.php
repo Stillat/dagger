@@ -75,3 +75,27 @@ test('hyphenated attributes are not case converted', function () {
         $this->render('<c-button data-thing="the thing" title="The Title" />')
     );
 });
+
+test('attribute passing', function () {
+    $daggerTemplate = <<<'BLADE'
+<c-attribute_passing_root class="mt-4" data-foo="bar" />
+BLADE;
+
+    $bladeTemplate = <<<'BLADE'
+<x-attribute_passing_root class="mt-4" data-foo="bar" />
+BLADE;
+
+    $expected = <<<'EXPECTED'
+Root: Child: data-thing="value" class="mt-4" data-foo="bar"After Child: class="mt-4" data-foo="bar"
+EXPECTED;
+
+    $this->assertSame(
+        $expected,
+        $this->render($daggerTemplate)
+    );
+
+    $this->assertSame(
+        $expected,
+        $this->render($bladeTemplate)
+    );
+});

@@ -1,0 +1,1 @@
+Child: {{ $attributes->merge(['data-thing' => 'value']) }}

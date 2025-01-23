@@ -88,6 +88,26 @@ class AttributeCompiler
         return $parameter->valueNode->content;
     }
 
+    protected function transformParameters(array $parameters): array
+    {
+        $newParams = [];
+
+        foreach ($parameters as $parameter) {
+            if ($parameter->type == ParameterType::AttributeEcho) {
+                $newParams[] = ParameterFactory::makeVariableReference(
+                    'attributes',
+                    (string) str($parameter->content)->trim()->substr(2, -2)->trim()
+                );
+
+                continue;
+            }
+
+            $newParams[] = $parameter;
+        }
+
+        return $newParams;
+    }
+
     /**
      * @param  ParameterNode[]  $parameters
      */
@@ -98,6 +118,8 @@ class AttributeCompiler
         if (count($parameters) === 0) {
             return [];
         }
+
+        $parameters = $this->transformParameters($parameters);
 
         $compiledParameters = [];
 
