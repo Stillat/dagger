@@ -41,6 +41,15 @@ class AttributeCompiler
         return str_replace('; ?>', '.\'', $value);
     }
 
+    protected function compileAttributeEchosValue(string $attributeString): string
+    {
+        $value = Blade::compileString($attributeString);
+
+        $value = str_replace('<?php echo ', '', $value);
+
+        return str_replace('; ?>', '', $value);
+    }
+
     protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value): string
     {
         return collect(token_get_all($value))->map(function ($token) {
@@ -88,6 +97,14 @@ class AttributeCompiler
         return $parameter->valueNode->content;
     }
 
+    protected function compileEchoValue(string $content): ParameterNode
+    {
+        return ParameterFactory::makeVariableReference(
+            Str::before($content, '='),
+            $this->compileAttributeEchosValue(Str::after($content, '='))
+        );
+    }
+
     protected function transformParameters(array $parameters): array
     {
         $newParams = [];
@@ -98,6 +115,14 @@ class AttributeCompiler
                     'attributes',
                     (string) str($parameter->content)->trim()->substr(2, -2)->trim()
                 );
+
+                continue;
+            } elseif (
+                $parameter->type == ParameterType::UnknownEcho ||
+                $parameter->type == ParameterType::UnknownTripleEcho ||
+                $parameter->type == ParameterType::UnknownRawEcho
+            ) {
+                $newParams[] = $this->compileEchoValue($parameter->content);
 
                 continue;
             }
@@ -131,11 +156,11 @@ class AttributeCompiler
                 $paramValue = $this->arrayValue($parameter->value);
                 $compiledParameters[] = $this->toArraySyntax($paramName, $paramValue);
             } elseif ($parameter->type == ParameterType::DynamicVariable) {
-                $paramName = Str::camel($parameter->materializedName);
+                $paramName = in_array($parameter->materializedName, $propNames) ? Str::camel($parameter->materializedName) : $parameter->materializedName;
                 $paramValue = $this->arrayValue($parameter->value, false);
                 $compiledParameters[] = $this->toArraySyntax($paramName, $paramValue);
             } elseif ($parameter->type == ParameterType::ShorthandDynamicVariable) {
-                $paramName = Str::camel($parameter->materializedName);
+                $paramName = in_array($parameter->materializedName, $propNames) ? Str::camel($parameter->materializedName) : $parameter->materializedName;
                 $paramValue = $this->arrayValue($parameter->value, false);
                 $compiledParameters[] = $this->toArraySyntax($paramName, $paramValue);
             } elseif ($parameter->type == ParameterType::EscapedParameter) {

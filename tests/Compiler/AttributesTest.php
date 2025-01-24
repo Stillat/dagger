@@ -99,3 +99,19 @@ EXPECTED;
         $this->render($bladeTemplate)
     );
 });
+
+test('echo attribute value', function () {
+    $template = <<<'BLADE'
+<c-button
+    title="The Button Title"
+    data-one={{ $value }}
+    data-two={{{ $value }}}
+    data-three={!! $value !!}
+/>
+BLADE;
+
+    $this->assertSame(
+        '<div data-one="&amp;&amp;" data-two="&amp;&amp;" data-three="&&">The Button Title</div>',
+        $this->render($template, ['value' => '&&'])
+    );
+});

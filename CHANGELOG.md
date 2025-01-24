@@ -4,6 +4,10 @@
 
 - `@aware` variables are automatically removed from the attribute bag, without needing to redefine them in `@props`
 - Adds support for passing attributes via. the `<c-component {{ $attributes }} />` attribute
+- Bumps minimum version of `stillat/blade-parser` to 1.10.3
+- Adds support for compiling component attributes of the form `<c-component attribute={{ $value }} />`
+- Adds support for compiling component attributes of the form `<c-component attribute={{{ $value }}} />`
+- Adds support for compiling component attributes of the form `<c-component attribute={!! $value !!} />`
 
 ## [v1.0.4](https://github.com/Stillat/dagger/compare/v1.0.3...v1.0.4) - 2025-01-21
 
