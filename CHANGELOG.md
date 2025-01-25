@@ -9,6 +9,7 @@
 - Adds support for compiling component attributes of the form `<c-component attribute={{{ $value }}} />`
 - Adds support for compiling component attributes of the form `<c-component attribute={!! $value !!} />`
 - Multi-word prop values will be available on nested components when passing `$attributes` to a child component
+- Internal component model instances will be cached during compilation, improving performance for heavily re-used components
 
 ## [v1.0.4](https://github.com/Stillat/dagger/compare/v1.0.3...v1.0.4) - 2025-01-21
 

@@ -42,9 +42,22 @@ class ComponentParser
 
     protected bool $evaluate = true;
 
-    public function __construct()
+    protected ComponentCache $componentCache;
+
+    protected string $currentCacheKey = '';
+
+    public function __construct(ComponentCache $componentCache)
     {
+        $this->componentCache = $componentCache;
         $this->printer = new Standard;
+    }
+
+    /**
+     * @internal
+     */
+    public function getComponentCache(): ComponentCache
+    {
+        return $this->componentCache;
     }
 
     public function setEvaluateModel(bool $evalModel): static
@@ -61,8 +74,23 @@ class ComponentParser
         return $this;
     }
 
+    protected function getCacheKey(string $path, string $template): string
+    {
+        $pathHash = md5($path);
+        $templateHash = md5($template);
+        $evalBit = $this->evaluate ? 'eval' : 'noeval';
+
+        return "{$pathHash}::{$templateHash}::{$evalBit}";
+    }
+
     public function parse(?ComponentNode $component, string $template, string $varSuffix, string $path = ''): ComponentState
     {
+        $this->currentCacheKey = $this->getCacheKey($path, $template);
+
+        if ($cachedState = $this->componentCache->get($this->currentCacheKey)) {
+            return $cachedState->updateNodeDetails($component, $varSuffix);
+        }
+
         $this->originalLineCount = mb_substr_count($template, "\n");
 
         $parser = PhpParser::makeParser();
@@ -247,9 +275,15 @@ class ComponentParser
 
         $component->lineOffset = $this->originalLineCount - mb_substr_count($innerTemplate, "\n");
 
-        return $component
+        $componentModel = $component
             ->setTemplate($innerTemplate)
             ->setNamedTemplates($namedTemplates);
+
+        // We need to clone here to avoid updating properties
+        // on the cached instance, i.e.,  dynamicVariables
+        $this->componentCache->put($this->currentCacheKey, clone $componentModel);
+
+        return $componentModel;
     }
 
     protected function findDirectiveArgs(array $nodes, string $directiveName): string
