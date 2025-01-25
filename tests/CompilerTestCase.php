@@ -8,6 +8,7 @@ use Orchestra\Testbench\TestCase;
 use Stillat\Dagger\Compiler\ComponentState;
 use Stillat\Dagger\Exceptions\Mapping\LineMapper;
 use Stillat\Dagger\Facades\Compiler;
+use Stillat\Dagger\Parser\ComponentCache;
 use Stillat\Dagger\Parser\ComponentParser;
 use Stillat\Dagger\ServiceProvider;
 
@@ -58,7 +59,7 @@ class CompilerTestCase extends TestCase
 
     protected function parseComponent(string $template): ComponentState
     {
-        $parser = new ComponentParser;
+        $parser = new ComponentParser(new ComponentCache);
         $parser->setComponentNamespaces(['c']);
 
         return $parser->parse(null, $template, 'random');

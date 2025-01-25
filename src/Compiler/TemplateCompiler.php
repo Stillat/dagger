@@ -29,6 +29,7 @@ use Stillat\Dagger\Exceptions\InvalidCompilerParameterException;
 use Stillat\Dagger\Exceptions\Mapping\LineMapper;
 use Stillat\Dagger\Exceptions\MissingComponentNamespaceException;
 use Stillat\Dagger\Facades\SourceMapper;
+use Stillat\Dagger\Parser\ComponentCache;
 use Stillat\Dagger\Parser\ComponentParser;
 use Stillat\Dagger\Runtime\ViewManifest;
 use Stillat\Dagger\Support\Utils;
@@ -119,7 +120,7 @@ final class TemplateCompiler
         $this->staticTemplateCompiler = new StaticTemplateCompiler;
         $this->replacementManager = new ReplacementManager;
         $this->componentCompiler = new ComponentCompiler;
-        $this->componentParser = new ComponentParser;
+        $this->componentParser = new ComponentParser(new ComponentCache);
         $this->compiler = Blade::getFacadeRoot();
         $this->attributeCompiler = new AttributeCompiler;
     }
@@ -578,6 +579,7 @@ PHP;
 
     public function cleanup(): void
     {
+        $this->componentParser->getComponentCache()->clear();
         $this->componentBlocks = [];
         $this->replacementManager->clear();
     }

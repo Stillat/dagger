@@ -66,9 +66,22 @@ class ComponentState
 
     public function __construct(
         public ?ComponentNode $node,
-        public readonly string $varSuffix,
+        public string $varSuffix,
     ) {
+        $this->updateNodeDetails($this->node, $this->varSuffix);
+    }
+
+    /**
+     * @internal
+     */
+    public function updateNodeDetails(?ComponentNode $node, string $varSuffix): static
+    {
+        $this->node = $node;
+        $this->varSuffix = $varSuffix;
+
         $this->compilerId = '{'.$this->node?->id ?? $this->varSuffix.'}';
+
+        return $this;
     }
 
     public function getCachePrefix(): string
