@@ -444,7 +444,7 @@ final class TemplateCompiler
             $compiledComponentTemplate = <<<'PHP'
 <?php
 try {
-$__componentData = $compiledParams;
+$__componentData = \Stillat\Dagger\Runtime\Attributes::mergeNestedAttributes($compiledParams, $compiledPropNames);
 /** COMPILE:PROPS_DEFAULT */
 /** COMPILE_IF_VAR:componentGlobalScope $targetVar = get_defined_vars(); */
 $__slotContainerVarSuffix = new \Stillat\Dagger\Runtime\SlotContainer;
