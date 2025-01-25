@@ -1,0 +1,1 @@
+<c-attribute_merging.foo :$attributes></c-attribute_merging.foo>

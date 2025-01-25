@@ -115,3 +115,27 @@ BLADE;
         $this->render($template, ['value' => '&&'])
     );
 });
+
+test('passed attributes are merged into the data', function () {
+    // Framework Reference: https://github.com/laravel/framework/issues/48956
+
+    $this->assertSame(
+        'the one second value | ',
+        $this->render('<c-attribute_merging.bar one="the one" two-word="second value" />'),
+    );
+
+    $this->assertSame(
+        'none second value | ',
+        $this->render('<c-attribute_merging.bar two-word="second value" />'),
+    );
+
+    $this->assertSame(
+        'none none | ',
+        $this->render('<c-attribute_merging.bar />'),
+    );
+
+    $this->assertSame(
+        'the one second value | class="one two three"',
+        $this->render('<c-attribute_merging.bar one="the one" two-word="second value" class="one two three" />'),
+    );
+});
