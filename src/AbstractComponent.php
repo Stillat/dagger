@@ -50,7 +50,7 @@ abstract class AbstractComponent
             return $this->parent;
         }
 
-        if (array_key_exists($name, $this->parentCache)) {
+        if (isset($this->parentCache[$name])) {
             return $this->parentCache[$name];
         }
 

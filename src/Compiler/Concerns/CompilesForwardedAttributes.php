@@ -42,7 +42,7 @@ trait CompilesForwardedAttributes
             $path = implode('#', explode('.', $path));
         }
 
-        if (! array_key_exists($path, $this->forwardedProperties)) {
+        if (! isset($this->forwardedProperties[$path])) {
             $this->forwardedProperties[$path] = [];
         }
 
@@ -109,7 +109,7 @@ trait CompilesForwardedAttributes
             ));
         }
 
-        if (array_key_exists($componentPath, $this->forwardedProperties)) {
+        if (isset($this->forwardedProperties[$componentPath])) {
             /** @var ForwardedAttribute $forwardedDetails */
             foreach ($this->forwardedProperties[$componentPath] as $forwardedDetails) {
                 $node->parameters[] = $this->compileForwardedParameter(

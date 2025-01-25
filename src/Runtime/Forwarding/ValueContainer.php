@@ -17,7 +17,7 @@ class ValueContainer
 
     public function getForwardedValue(string $path): mixed
     {
-        if (! array_key_exists($path, $this->forwardedValues)) {
+        if (! isset($this->forwardedValues[$path])) {
             return null;
         }
 

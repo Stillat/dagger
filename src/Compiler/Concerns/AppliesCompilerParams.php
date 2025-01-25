@@ -48,7 +48,7 @@ trait AppliesCompilerParams
                 return [mb_substr($param->name, 1) => $param->value];
             })->all();
 
-        if (array_key_exists('id', $compilerParams)) {
+        if (isset($compilerParams['id'])) {
             $component->compilerId = '#'.$compilerParams['id'];
             $component->hasUserSuppliedId = true;
         }

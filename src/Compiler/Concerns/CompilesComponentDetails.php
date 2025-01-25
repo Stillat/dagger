@@ -62,7 +62,7 @@ trait CompilesComponentDetails
     {
         $componentPrefix = mb_strtolower($componentPrefix);
 
-        if (! array_key_exists($componentPrefix, $this->prefixNamespaces)) {
+        if (! isset($this->prefixNamespaces[$componentPrefix])) {
             throw new MissingComponentNamespaceException("View namespace not available for [{$componentPrefix}]");
         }
 

@@ -38,7 +38,7 @@ class ViewManifest
         }
 
         foreach ($manifest as $root => $details) {
-            if (! array_key_exists($root, $this->tracked)) {
+            if (! isset($this->tracked[$root])) {
                 $this->tracked[$root] = $details;
 
                 continue;

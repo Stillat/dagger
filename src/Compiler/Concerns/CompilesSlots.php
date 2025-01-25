@@ -30,7 +30,7 @@ trait CompilesSlots
         $output = '';
         $componentPath = $this->getForwardedComponentPath();
 
-        if (! array_key_exists($componentPath, $this->forwardedSlots)) {
+        if (! isset($this->forwardedSlots[$componentPath])) {
             return $output;
         }
 
@@ -101,7 +101,7 @@ PHP;
             $parentSlotPath = Str::beforeLast($childSlotPath, '.');
             $childSlotName = Str::after($childSlotPath, '.');
 
-            if (! array_key_exists($parentSlotPath, $this->forwardedSlots)) {
+            if (! isset($this->forwardedSlots[$parentSlotPath])) {
                 $this->forwardedSlots[$parentSlotPath] = [
                     'slots' => [],
                 ];
@@ -214,7 +214,7 @@ PHP;
             }
 
             $fullSlotPath = $this->activeComponent->compilerId.'.'.$slot->getName();
-            if (array_key_exists($fullSlotPath, $this->forwardedSlotPaths)) {
+            if (isset($this->forwardedSlotPaths[$fullSlotPath])) {
                 unset($this->forwardedSlotPaths[$fullSlotPath]);
 
                 continue;
@@ -292,7 +292,7 @@ PHP;
 
         $tmpSlotPath = $this->activeComponent->compilerId.'.default';
 
-        if (array_key_exists($tmpSlotPath, $this->forwardedSlotPaths)) {
+        if (isset($this->forwardedSlotPaths[$tmpSlotPath])) {
             $varContainer = $this->forwardedSlotPaths[$tmpSlotPath];
             unset($this->forwardedSlotPaths[$tmpSlotPath]);
 

@@ -38,7 +38,7 @@ trait CompilesPhp
         $componentDataVar = $this->activeComponent->componentDataVar();
 
         $initializerTemplate = <<<'PHP'
-if (! array_key_exists('$varName', $componentDataVar)) {
+if (! isset($componentDataVar['$varName'])) {
     $componentDataVar['$varName'] = $default;
 }
 PHP;
@@ -128,7 +128,7 @@ PHP;
         $awareVars = $this->activeComponent->getAwareVariablesAndDefaults();
 
         $awareInitializerTemplate = <<<'PHP'
-if (! array_key_exists('$varName', $componentDataVar)) { 
+if (! isset($componentDataVar['$varName'])) { 
     if ($__awareResolveVar = $__env->getConsumableComponentData('$varName', $defaultValue)) {
         if ($__awareResolveVar != $checkVal) {
             $componentDataVar['$varName'] = $__awareResolveVar;
@@ -147,7 +147,7 @@ PHP;
             if (! is_string($key)) {
                 $varName = $defaultValue;
 
-                if (array_key_exists($key, $defaultVars)) {
+                if (isset($defaultVars[$key])) {
                     $callDefault = $defaultVars[$key];
                 }
             } else {
