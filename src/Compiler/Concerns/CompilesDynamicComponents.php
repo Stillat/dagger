@@ -10,8 +10,6 @@ use Stillat\Dagger\Support\Utils;
 
 trait CompilesDynamicComponents
 {
-    protected array $dynamicComponentCache = [];
-
     public static function getDynamicComponentContent(string $result, string $dynamicName): string
     {
         return Str::after($result, '[---'.$dynamicName.'---]');

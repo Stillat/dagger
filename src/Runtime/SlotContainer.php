@@ -42,7 +42,7 @@ class SlotContainer
 
     public function hasDefaultSlotContent(): bool
     {
-        return array_key_exists(self::DEFAULT_SLOT_KEY, $this->contents);
+        return isset($this->contents[static::DEFAULT_SLOT_KEY]);
     }
 
     public function getDefaultContent(): ComponentSlot
@@ -57,6 +57,6 @@ class SlotContainer
 
     public function hasSlot(string $slotName): bool
     {
-        return array_key_exists($slotName, $this->contents);
+        return isset($this->contents[$slotName]);
     }
 }

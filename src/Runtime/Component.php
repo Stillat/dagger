@@ -59,7 +59,7 @@ class Component extends AbstractComponent
     {
         $className = get_class($instance);
 
-        if (array_key_exists($className, self::$methodCache)) {
+        if (isset(static::$methodCache[$className])) {
             return self::$methodCache[$className];
         }
 
@@ -130,7 +130,7 @@ class Component extends AbstractComponent
 
     public function __call($method, $parameters)
     {
-        if (! array_key_exists($method, $this->macros)) {
+        if (! isset($this->macros[$method])) {
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));

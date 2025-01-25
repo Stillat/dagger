@@ -135,7 +135,7 @@ class ComponentState
 
     protected function makeDynamicVariable(string $varName): string
     {
-        if (array_key_exists($varName, $this->dynamicVariables)) {
+        if (isset($this->dynamicVariables[$varName])) {
             return $this->dynamicVariables[$varName];
         }
 
@@ -187,7 +187,7 @@ class ComponentState
 
     public function getDynamicVariable(string $varName): string
     {
-        if (! array_key_exists($varName, $this->dynamicVariables)) {
+        if (! isset($this->dynamicVariables[$varName])) {
             throw new InvalidArgumentException("Dynamic variable {$varName} has not been created.");
         }
 
@@ -196,7 +196,7 @@ class ComponentState
 
     public function hasCreatedDynamicVariable(string $varName): bool
     {
-        return array_key_exists($varName, $this->dynamicVariables);
+        return isset($this->dynamicVariables[$varName]);
     }
 
     public function getVariableForwardingVariable(): string
@@ -266,7 +266,7 @@ class ComponentState
         $variables = $this->defaultAwareValues;
 
         foreach ($this->aware as $var) {
-            if (! array_key_exists($var, $variables)) {
+            if (! isset($variables[$var])) {
                 $variables[] = $var;
             }
         }
