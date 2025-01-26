@@ -62,13 +62,29 @@ class ComponentState
 
     public string $validationMessages = '[]';
 
+    public ?bool $canCompileTimeRender = null;
+
     public int $lineOffset = 0;
+
+    public ?Extractions $extractions = null;
+
+    /**
+     * Indicates if the component is eligible for compile-time rendering.
+     *
+     * We will keep it false by default, and only enable this if needed.
+     */
+    public bool $isCtrEligible = false;
 
     public function __construct(
         public ?ComponentNode $node,
         public string $varSuffix,
     ) {
         $this->updateNodeDetails($this->node, $this->varSuffix);
+    }
+
+    public function getDynamicVariables(): array
+    {
+        return $this->dynamicVariables;
     }
 
     /**
@@ -284,6 +300,11 @@ class ComponentState
         return $this;
     }
 
+    public function getAllPropNames(): array
+    {
+        return array_merge($this->getPropNames(), $this->getAwareVariables());
+    }
+
     public function getPropDefaults(): array
     {
         return $this->defaultPropValues;
@@ -337,6 +358,11 @@ class ComponentState
         $this->mixins = $classes;
 
         return $this;
+    }
+
+    public function hasMixins(): bool
+    {
+        return $this->mixins != '';
     }
 
     public function getMixins(): string

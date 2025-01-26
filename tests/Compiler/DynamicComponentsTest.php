@@ -8,12 +8,12 @@ uses(CompilerTestCase::class);
 test('it renders dynamic components', function () {
     $template = <<<'BLADE'
 <c-dynamic-component component="dynamic.component_a" title="The Title" />
+
 <c-dynamic-component component="dynamic.component_b" title="The Title" />
 BLADE;
 
     $expected = <<<'EXPECTED'
 Component A: The Title
-
 Component B: The Title
 EXPECTED;
 
@@ -26,12 +26,12 @@ EXPECTED;
 test('it renders dynamic components with proxy alias', function () {
     $template = <<<'BLADE'
 <c-proxy component="dynamic.component_a" title="The Title" />
+
 <c-proxy component="dynamic.component_b" title="The Title" />
 BLADE;
 
     $expected = <<<'EXPECTED'
 Component A: The Title
-
 Component B: The Title
 EXPECTED;
 
@@ -44,12 +44,12 @@ EXPECTED;
 test('it renders dynamic components with delegate-component alias', function () {
     $template = <<<'BLADE'
 <c-delegate-component component="dynamic.component_a" title="The Title" />
+
 <c-delegate-component component="dynamic.component_b" title="The Title" />
 BLADE;
 
     $expected = <<<'EXPECTED'
 Component A: The Title
-
 Component B: The Title
 EXPECTED;
 

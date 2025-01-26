@@ -22,8 +22,10 @@ use Stillat\Dagger\Compiler\Concerns\CompilesForwardedAttributes;
 use Stillat\Dagger\Compiler\Concerns\CompilesPhp;
 use Stillat\Dagger\Compiler\Concerns\CompilesSlots;
 use Stillat\Dagger\Compiler\Concerns\CompilesStencils;
+use Stillat\Dagger\Compiler\Concerns\ManagesComponentCtrState;
 use Stillat\Dagger\Compiler\Concerns\ManagesExceptions;
 use Stillat\Dagger\Exceptions\CompilerException;
+use Stillat\Dagger\Exceptions\CompilerRenderException;
 use Stillat\Dagger\Exceptions\ComponentException;
 use Stillat\Dagger\Exceptions\InvalidCompilerParameterException;
 use Stillat\Dagger\Exceptions\Mapping\LineMapper;
@@ -33,6 +35,7 @@ use Stillat\Dagger\Parser\ComponentCache;
 use Stillat\Dagger\Parser\ComponentParser;
 use Stillat\Dagger\Runtime\ViewManifest;
 use Stillat\Dagger\Support\Utils;
+use Throwable;
 
 final class TemplateCompiler
 {
@@ -47,6 +50,7 @@ final class TemplateCompiler
         CompilesPhp,
         CompilesSlots,
         CompilesStencils,
+        ManagesComponentCtrState,
         ManagesExceptions;
 
     protected array $compilerDirectiveParams = [
@@ -92,17 +96,19 @@ final class TemplateCompiler
 
     protected ReplacementManager $replacementManager;
 
-    protected StaticTemplateCompiler $staticTemplateCompiler;
-
     protected LineMapper $lineMapper;
 
     protected ?ComponentState $activeComponent = null;
 
     protected CompilerOptions $options;
 
+    protected Renderer $renderer;
+
     protected ?string $currentViewName = null;
 
     protected ?string $currentCachePath = null;
+
+    protected bool $enabled = true;
 
     public function __construct(ViewManifest $manifest, Factory $factory, LineMapper $lineMapper, string $cachePath)
     {
@@ -117,12 +123,12 @@ final class TemplateCompiler
         $this->storeRawBlockProxy->setAccessible(true);
 
         $this->printer = new Standard;
-        $this->staticTemplateCompiler = new StaticTemplateCompiler;
         $this->replacementManager = new ReplacementManager;
         $this->componentCompiler = new ComponentCompiler;
         $this->componentParser = new ComponentParser(new ComponentCache);
         $this->compiler = Blade::getFacadeRoot();
         $this->attributeCompiler = new AttributeCompiler;
+        $this->renderer = new Renderer($this, $this->compiler);
     }
 
     public function getOptions(): CompilerOptions
@@ -265,6 +271,24 @@ final class TemplateCompiler
 
         if (count($this->componentStack) > 0) {
             $this->activeComponent = $this->componentStack[array_key_last($this->componentStack)];
+        } else {
+            $this->cleanupAfterComponentStack();
+        }
+    }
+
+    protected function cleanupAfterComponentStack(): void
+    {
+        $this->renderer->reset();
+    }
+
+    /**
+     * @internal
+     */
+    public function disableCompileTimeRenderOnStack(): void
+    {
+        /** @var ComponentState $state */
+        foreach ($this->componentStack as $state) {
+            $state->canCompileTimeRender = false;
         }
     }
 
@@ -280,6 +304,21 @@ final class TemplateCompiler
         }
 
         return $depVars;
+    }
+
+    /**
+     * @internal
+     */
+    public function hasBoundScopeVariables(): bool
+    {
+        /** @var ComponentState $componentState */
+        foreach ($this->componentStack as $componentState) {
+            if (! empty($componentState->boundScopeVariables)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function incrementCompilerDepth(): void
@@ -401,13 +440,13 @@ final class TemplateCompiler
 
             $slotContainerVar = '__slotContainer'.$varSuffix;
 
-            $extractions = $this->extractDetails($node);
-            $innerContent = $extractions->content;
+            $this->activeComponent->extractions = $this->extractDetails($node);
+            $innerContent = $this->activeComponent->extractions->content;
 
-            $compiledSlots = $this->compileForwardedSlots($extractions->forwardedSlots);
+            $compiledSlots = $this->compileForwardedSlots($this->activeComponent->extractions->forwardedSlots);
             $compiledSlots .= $this->compileSlotContent($innerContent, $slotContainerVar);
 
-            $compiledSlots .= $this->compileNamedSlots($extractions->namedSlots, $slotContainerVar);
+            $compiledSlots .= $this->compileNamedSlots($this->activeComponent->extractions->namedSlots, $slotContainerVar);
 
             if ($this->activeComponent->hasUserSuppliedId) {
                 $compiledSlots .= $this->forwardSlots($slotContainerVar);
@@ -418,22 +457,7 @@ final class TemplateCompiler
             }
 
             $innerTemplate = $componentModel->getTemplate();
-
-            [$isStaticTemplate, $staticTemplate] = $this->staticTemplateCompiler->testTemplate(
-                $this->activeComponent,
-                $innerTemplate,
-                $this->getDynamicStrings()
-            );
-
-            if ($isStaticTemplate) {
-                $this->stopCompilingComponent();
-
-                $compiled .= $staticTemplate;
-
-                continue;
-            }
-
-            $innerTemplate = $this->compileStencils($componentModel, $extractions, $innerTemplate);
+            $innerTemplate = $this->compileStencils($componentModel, $this->activeComponent->extractions, $innerTemplate);
 
             $compiledComponentParams = $this->attributeCompiler->compile(
                 $this->filterComponentParams($node->parameters ?? []),
@@ -519,6 +543,12 @@ PHP;
                 $innerContent = $this->componentCompiler->compile(
                     $this->compiler->compileString($this->compile($innerTemplate))
                 );
+
+                try {
+                    $this->checkForCtrEligibility($innerTemplate, $innerContent);
+                } catch (Throwable) {
+                    $this->activeComponent->isCtrEligible = false;
+                }
             } catch (Error $error) {
                 throw SourceMapper::convertParserError($error, $innerTemplate, $sourcePath, $componentModel->lineOffset);
             }
@@ -538,10 +568,7 @@ PHP;
 
             $compiledComponentTemplate = $this->compileCompilerDirectives($compiledComponentTemplate);
 
-            $propNames = array_flip(array_merge(
-                $componentModel->getPropNames(),
-                $componentModel->getAwareVariables(),
-            ));
+            $propNames = array_flip($componentModel->getAllPropNames());
 
             $swapVars = [
                 '#cachePath#' => $cachePath ?? '',
@@ -562,9 +589,25 @@ PHP;
             ];
 
             $compiledComponentTemplate = Str::swap($swapVars, $compiledComponentTemplate);
-            $compiledComponentTemplate = $this->compileExceptions($compiledComponentTemplate);
 
-            $compiled .= $compiledComponentTemplate;
+            if (! $this->renderer->canRender($this->activeComponent)) {
+                $compiled .= $this->finalizeCompiledComponent($compiledComponentTemplate);
+            } else {
+                $this->enabled = false;
+                try {
+                    $renderedResult = $this->renderer->render(
+                        $this->activeComponent,
+                        $this->resolveBlocks($compiledComponentTemplate)
+                    );
+
+                    $compiled .= $this->storeComponentBlock($renderedResult);
+                } catch (CompilerRenderException) {
+                    $compiled .= $this->finalizeCompiledComponent($compiledComponentTemplate);
+                } finally {
+                    $this->enabled = true;
+                }
+            }
+
             $this->stopCompilingComponent();
         }
 
@@ -577,11 +620,18 @@ PHP;
         return $compiled;
     }
 
+    protected function finalizeCompiledComponent(string $compiledComponentTemplate): string
+    {
+        return $this->compileExceptions($compiledComponentTemplate);
+    }
+
     public function cleanup(): void
     {
         $this->componentParser->getComponentCache()->clear();
-        $this->componentBlocks = [];
+        $this->renderer->clear();
         $this->replacementManager->clear();
+
+        $this->componentBlocks = [];
     }
 
     protected function compileVariableCleanup(array $variables): string
@@ -620,6 +670,10 @@ PHP;
      */
     public function compile(string $template): string
     {
+        if (! $this->enabled) {
+            return $template;
+        }
+
         $this->newlineStyle = Utils::getNewlineStyle($template);
 
         if ($this->isRoot()) {

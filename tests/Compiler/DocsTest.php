@@ -259,7 +259,9 @@ BLADE;
 
     $expected = <<<'EXPECTED'
 <div>
-    <button >The Save Button</button>    <button >The Cancel Button</button></div>
+    <button >The Save Button</button>
+    <button >The Cancel Button</button>
+</div>
 EXPECTED;
 
     $this->assertSame(
