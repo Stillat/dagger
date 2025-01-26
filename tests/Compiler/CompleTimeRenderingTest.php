@@ -240,3 +240,11 @@ test('compile time rendering can be disabled via compiler options', function () 
     $this->assertNotEquals('The Title', $compiled);
     $this->assertEquals('The Title', $rendered);
 });
+
+test('compile time rendering skips components with "unsafe" function calls', function () {
+    $compiled = $this->compile('<c-ctr.unsafe_calls />');
+
+    $this->assertStringContainsString('e(time());', $compiled);
+    $this->assertStringContainsString('e(now());', $compiled);
+    $this->assertStringContainsString("e(date('l'));", $compiled);
+});
