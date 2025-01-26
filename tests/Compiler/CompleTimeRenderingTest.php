@@ -232,3 +232,11 @@ test('compile time rendering respects trim output', function () {
         $this->compile('<c-ctr.trimmed_output title="The Title" />')
     );
 });
+
+test('compile time rendering can be disabled via compiler options', function () {
+    $compiled = $this->compile('<c-ctr.disabled title="The Title" />');
+    $rendered = $this->render('<c-ctr.disabled title="The Title" />');
+
+    $this->assertNotEquals('The Title', $compiled);
+    $this->assertEquals('The Title', $rendered);
+});

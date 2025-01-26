@@ -3,6 +3,7 @@
 namespace Stillat\Dagger\Parser;
 
 use Stillat\Dagger\AbstractComponent;
+use Stillat\Dagger\ComponentOptions;
 use Stillat\Dagger\Exceptions\InvalidArgumentException;
 use Stillat\Dagger\Support\Asserts;
 
@@ -26,6 +27,8 @@ class Component extends AbstractComponent
 
     protected string $mixins = '';
 
+    protected ?ComponentOptions $options;
+
     /**
      * @throws InvalidArgumentException
      */
@@ -36,6 +39,11 @@ class Component extends AbstractComponent
         $this->props = $props;
 
         return $this;
+    }
+
+    public function getComponentOptions(): ComponentOptions
+    {
+        return $this->options ?? new ComponentOptions;
     }
 
     public function validateProps(array|string $props, array|string $messages = []): static
@@ -65,6 +73,14 @@ class Component extends AbstractComponent
         $this->assertIsString($aware, 'Supplied "aware" variables must be a string.');
 
         $this->awareVariables = $aware;
+
+        return $this;
+    }
+
+    public function compiler(?bool $allowCtr = null): static
+    {
+        $this->options = new ComponentOptions;
+        $this->options->allowCtr = $allowCtr ?? $this->options->allowCtr;
 
         return $this;
     }

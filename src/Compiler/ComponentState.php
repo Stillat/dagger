@@ -5,6 +5,7 @@ namespace Stillat\Dagger\Compiler;
 use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
+use Stillat\Dagger\ComponentOptions;
 use Stillat\Dagger\Support\Utils;
 
 class ComponentState
@@ -68,6 +69,8 @@ class ComponentState
 
     public ?Extractions $extractions = null;
 
+    public ComponentOptions $options;
+
     /**
      * Indicates if the component is eligible for compile-time rendering.
      *
@@ -79,6 +82,7 @@ class ComponentState
         public ?ComponentNode $node,
         public string $varSuffix,
     ) {
+        $this->options = new ComponentOptions;
         $this->updateNodeDetails($this->node, $this->varSuffix);
     }
 

@@ -12,6 +12,12 @@ trait ManagesComponentCtrState
 {
     protected function checkForCtrEligibility(string $originalTemplate, string $compiledTemplate): void
     {
+        if (! $this->activeComponent->options->allowCtr) {
+            $this->activeComponent->isCtrEligible = false;
+
+            return;
+        }
+
         if (Renderer::containsOtherComponents($originalTemplate)) {
             $this->activeComponent->isCtrEligible = false;
 

@@ -179,6 +179,7 @@ class ComponentParser
 
         $model = $this->evaluateComponentModel($this->printer->prettyPrintFile($componentModelAst));
         $innerTemplate = $this->printer->prettyPrintFile($newAst);
+        $componentState->options = $model->getComponentOptions();
 
         $componentState->shouldCache = $model->getShouldCache();
         $componentState->trimOutput = $model->getTrimOutput();
