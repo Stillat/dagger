@@ -41,12 +41,20 @@ class ServiceProvider extends IlluminateServiceProvider
                 $app['config']['view.compiled']
             );
 
+            $compiler->setCtrUnsafeFunctionCalls(config('dagger.ctr.unsafe_functions') ?? []);
+
             return $compiler;
         });
     }
 
     public function boot()
     {
+        $this->publishes([
+            __DIR__.'/../config/dagger.php' => config_path('dagger.php'),
+        ]);
+
+        $this->mergeConfigFrom(__DIR__.'/../config/dagger.php', 'dagger');
+
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'dagger');
 
         if ($this->app->runningInConsole()) {

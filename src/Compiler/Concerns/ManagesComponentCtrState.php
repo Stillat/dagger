@@ -10,6 +10,18 @@ use Stillat\Dagger\Parser\Visitors\CompileTimeRendererVisitor;
 
 trait ManagesComponentCtrState
 {
+    public function setCtrUnsafeFunctionCalls(array $unsafeFunctionCalls): self
+    {
+        $this->ctrUnsafeFunctionCalls = $unsafeFunctionCalls;
+
+        return $this;
+    }
+
+    public function getCtrUnsafeFunctionCalls(): array
+    {
+        return $this->ctrUnsafeFunctionCalls;
+    }
+
     protected function checkForCtrEligibility(string $originalTemplate, string $compiledTemplate): void
     {
         if (! $this->activeComponent->options->allowCtr) {
@@ -33,7 +45,10 @@ trait ManagesComponentCtrState
 
         $traverser->removeVisitor($parentingVisitor);
 
-        $ctrVisitor = new CompileTimeRendererVisitor($this->activeComponent);
+        $ctrVisitor = new CompileTimeRendererVisitor(
+            $this->activeComponent,
+            $this->ctrUnsafeFunctionCalls
+        );
 
         $traverser->addVisitor($ctrVisitor);
         $traverser->traverse($ast);

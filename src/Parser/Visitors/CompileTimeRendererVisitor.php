@@ -19,15 +19,13 @@ class CompileTimeRendererVisitor implements NodeVisitor
         'Stillat\Dagger\current',
     ];
 
-    protected array $generallyUnsafeCalls = [
-        'now',
-        'time',
-        'date',
-    ];
+    protected array $unsafeFunctionCalls = [];
 
-    public function __construct(ComponentState $componentState)
+    public function __construct(ComponentState $componentState, array $unsafeFunctionCalls)
     {
         $this->componentState = $componentState;
+
+        $this->unsafeFunctionCalls = $unsafeFunctionCalls;
     }
 
     protected function isComponentVar($node): bool
@@ -68,7 +66,7 @@ class CompileTimeRendererVisitor implements NodeVisitor
 
             $name = $node->name->toString();
 
-            if (in_array($name, $this->generallyUnsafeCalls)) {
+            if (in_array($name, $this->unsafeFunctionCalls)) {
                 $this->isCtrEligible = false;
 
                 return;
