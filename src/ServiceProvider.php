@@ -45,7 +45,8 @@ class ServiceProvider extends IlluminateServiceProvider
 
             $ctrVisitor = $compiler->getCtrVisitor();
             $ctrVisitor->setUnsafeFunctionCalls($ctrConfig['unsafe_functions'] ?? [])
-                ->setUnsafeVariableNames($ctrConfig['unsafe_variables'] ?? []);
+                ->setUnsafeVariableNames($ctrConfig['unsafe_variables'] ?? [])
+                ->setAppAliases(config('app.aliases') ?? []);
 
             return $compiler;
         });

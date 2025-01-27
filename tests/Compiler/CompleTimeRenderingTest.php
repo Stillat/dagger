@@ -259,3 +259,10 @@ EXPECTED;
         $this->compile('<c-ctr.unsafe_vars title="The Title" />'),
     );
 });
+
+test('compile time rendering with static methods', function () {
+    $this->assertSame(
+        'THE TITLE',
+        $this->compile('<c-ctr.static_methods title="The Title" />'),
+    );
+});

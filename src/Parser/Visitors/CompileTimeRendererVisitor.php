@@ -2,6 +2,16 @@
 
 namespace Stillat\Dagger\Parser\Visitors;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Js;
+use Illuminate\Support\Str;
+use League\Uri\Http;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use Stillat\Dagger\Compiler\ComponentState;
@@ -11,6 +21,19 @@ class CompileTimeRendererVisitor implements NodeVisitor
     protected ?ComponentState $componentState = null;
 
     protected bool $isCtrEligible = true;
+
+    protected array $allowedFrameworkClasses = [
+        Str::class,
+        Arr::class,
+        Cache::class,
+        Config::class,
+        Crypt::class,
+        Hash::class,
+        Http::class,
+        Js::class,
+        URL::class,
+        Validator::class,
+    ];
 
     protected array $nonCtrMethodNames = [
         'Stillat\Dagger\component',
@@ -22,6 +45,8 @@ class CompileTimeRendererVisitor implements NodeVisitor
     protected array $unsafeFunctionCalls = [];
 
     protected array $unsafeVariableNames = [];
+
+    protected array $appAliases = [];
 
     public function reset(): self
     {
@@ -40,6 +65,13 @@ class CompileTimeRendererVisitor implements NodeVisitor
     public function setUnsafeFunctionCalls(array $unsafeFunctionCalls): static
     {
         $this->unsafeFunctionCalls = $unsafeFunctionCalls;
+
+        return $this;
+    }
+
+    public function setAppAliases(array $aliases): static
+    {
+        $this->appAliases = $aliases;
 
         return $this;
     }
@@ -104,7 +136,34 @@ class CompileTimeRendererVisitor implements NodeVisitor
             if (in_array($node->name, $this->unsafeVariableNames) || in_array($prefixed, $this->unsafeVariableNames)) {
                 $this->isCtrEligible = false;
             }
+        } elseif ($node instanceof Node\Expr\StaticCall) {
+            $name = $this->getStaticCallName($node);
+
+            if (! $name) {
+                $this->isCtrEligible = false;
+
+                return;
+            }
+
+            if (in_array($name, $this->allowedFrameworkClasses)) {
+                return;
+            }
         }
+    }
+
+    protected function getStaticCallName(Node\Expr\StaticCall $call): string
+    {
+        $name = '';
+
+        if ($call->class instanceof Node\Name\FullyQualified) {
+            $name = $call->class->toString();
+        } elseif ($call->class instanceof Node\Name) {
+            $name = $call->class->toString();
+
+            $name = $this->appAliases[$name] ?? $name;
+        }
+
+        return $name;
     }
 
     public function isEligibleForCtr(): bool
