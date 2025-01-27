@@ -41,7 +41,11 @@ class ServiceProvider extends IlluminateServiceProvider
                 $app['config']['view.compiled']
             );
 
-            $compiler->setCtrUnsafeFunctionCalls(config('dagger.ctr.unsafe_functions') ?? []);
+            $ctrConfig = config('dagger.ctr') ?? [];
+
+            $ctrVisitor = $compiler->getCtrVisitor();
+            $ctrVisitor->setUnsafeFunctionCalls($ctrConfig['unsafe_functions'] ?? [])
+                ->setUnsafeVariableNames($ctrConfig['unsafe_variables'] ?? []);
 
             return $compiler;
         });

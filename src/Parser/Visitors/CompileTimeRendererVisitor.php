@@ -23,15 +23,23 @@ class CompileTimeRendererVisitor implements NodeVisitor
 
     protected array $unsafeVariableNames = [];
 
-    public function __construct(array $unsafeFunctionCalls, array $unsafeVariableNames)
-    {
-        $this->unsafeFunctionCalls = $unsafeFunctionCalls;
-        $this->unsafeVariableNames = $unsafeVariableNames;
-    }
-
     public function reset(): self
     {
         $this->isCtrEligible = true;
+
+        return $this;
+    }
+
+    public function setUnsafeVariableNames(array $unsafeVariableNames): static
+    {
+        $this->unsafeVariableNames = $unsafeVariableNames;
+
+        return $this;
+    }
+
+    public function setUnsafeFunctionCalls(array $unsafeFunctionCalls): static
+    {
+        $this->unsafeFunctionCalls = $unsafeFunctionCalls;
 
         return $this;
     }
