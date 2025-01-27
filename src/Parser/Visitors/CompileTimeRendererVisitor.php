@@ -42,6 +42,11 @@ class CompileTimeRendererVisitor implements NodeVisitor
         'Stillat\Dagger\current',
     ];
 
+    protected array $restrictedComponentProperties = [
+        'depth',
+        'parent',
+    ];
+
     protected array $unsafeFunctionCalls = [];
 
     protected array $unsafeVariableNames = [];
@@ -101,10 +106,10 @@ class CompileTimeRendererVisitor implements NodeVisitor
 
             $name = $node->name->toString();
 
-            if ($name === 'depth') {
+            if (in_array($name, $this->restrictedComponentProperties)) {
                 $this->isCtrEligible = false;
-            } elseif ($name === 'parent') {
-                $this->isCtrEligible = false;
+
+                return;
             }
         } elseif ($node instanceof Node\Expr\MethodCall) {
             if (! $this->isComponentVar($node->var)) {
