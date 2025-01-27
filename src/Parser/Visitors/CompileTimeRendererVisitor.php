@@ -125,12 +125,10 @@ class CompileTimeRendererVisitor implements NodeVisitor
             if (in_array($name, $this->nonCtrMethodNames)) {
                 $this->isCtrEligible = false;
             }
-        } elseif ($node instanceof Node\Expr\Variable) {
-            $prefixed = '$'.$node->name;
+        } elseif ($node instanceof Node\Expr\Variable && $this->isUnsafeVariable($node->name)) {
+            $this->isCtrEligible = false;
 
-            if (in_array($node->name, $this->unsafeVariableNames) || in_array($prefixed, $this->unsafeVariableNames)) {
-                $this->isCtrEligible = false;
-            }
+            return;
         } elseif ($node instanceof Node\Expr\StaticCall) {
             $name = $this->getStaticCallName($node);
 
@@ -144,6 +142,13 @@ class CompileTimeRendererVisitor implements NodeVisitor
                 return;
             }
         }
+    }
+
+    protected function isUnsafeVariable(string $name): bool
+    {
+        $prefixed = '$'.$name;
+
+        return in_array($name, $this->unsafeVariableNames) || in_array($prefixed, $this->unsafeVariableNames);
     }
 
     protected function getStaticCallName(Node\Expr\StaticCall $call): string
