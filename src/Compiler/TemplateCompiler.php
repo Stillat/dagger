@@ -110,8 +110,6 @@ final class TemplateCompiler
 
     protected bool $enabled = true;
 
-    protected array $ctrUnsafeFunctionCalls = [];
-
     public function __construct(ViewManifest $manifest, Factory $factory, LineMapper $lineMapper, string $cachePath)
     {
         $this->options = new CompilerOptions;

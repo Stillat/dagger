@@ -10,6 +10,10 @@ use Stillat\Dagger\Parser\Visitors\CompileTimeRendererVisitor;
 
 trait ManagesComponentCtrState
 {
+    protected array $ctrUnsafeFunctionCalls = [];
+
+    protected array $ctrUnsafeVariableNames = [];
+
     public function setCtrUnsafeFunctionCalls(array $unsafeFunctionCalls): self
     {
         $this->ctrUnsafeFunctionCalls = $unsafeFunctionCalls;
@@ -20,6 +24,18 @@ trait ManagesComponentCtrState
     public function getCtrUnsafeFunctionCalls(): array
     {
         return $this->ctrUnsafeFunctionCalls;
+    }
+
+    public function setCtrUnsafeVariableNames(array $unsafeVariableNames): self
+    {
+        $this->ctrUnsafeVariableNames = $unsafeVariableNames;
+
+        return $this;
+    }
+
+    public function getCtrUnsafeVariableNameS(): array
+    {
+        return $this->ctrUnsafeVariableNames;
     }
 
     protected function checkForCtrEligibility(string $originalTemplate, string $compiledTemplate): void
@@ -47,7 +63,8 @@ trait ManagesComponentCtrState
 
         $ctrVisitor = new CompileTimeRendererVisitor(
             $this->activeComponent,
-            $this->ctrUnsafeFunctionCalls
+            $this->ctrUnsafeFunctionCalls,
+            $this->ctrUnsafeVariableNames,
         );
 
         $traverser->addVisitor($ctrVisitor);

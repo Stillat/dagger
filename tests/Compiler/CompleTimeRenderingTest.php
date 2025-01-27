@@ -248,3 +248,14 @@ test('compile time rendering skips components with "unsafe" function calls', fun
     $this->assertStringContainsString('e(now());', $compiled);
     $this->assertStringContainsString("e(date('l'));", $compiled);
 });
+
+test('compile time rendering skips components with "unsafe" variables', function () {
+    $expected = <<<'EXPECTED'
+echo e($title . $_GET['something']);
+EXPECTED;
+
+    $this->assertStringContainsString(
+        $expected,
+        $this->compile('<c-ctr.unsafe_vars title="The Title" />'),
+    );
+});

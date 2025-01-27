@@ -21,11 +21,14 @@ class CompileTimeRendererVisitor implements NodeVisitor
 
     protected array $unsafeFunctionCalls = [];
 
-    public function __construct(ComponentState $componentState, array $unsafeFunctionCalls)
+    protected array $unsafeVariableNames = [];
+
+    public function __construct(ComponentState $componentState, array $unsafeFunctionCalls, array $unsafeVariableNames)
     {
         $this->componentState = $componentState;
 
         $this->unsafeFunctionCalls = $unsafeFunctionCalls;
+        $this->unsafeVariableNames = $unsafeVariableNames;
     }
 
     protected function isComponentVar($node): bool
@@ -73,6 +76,12 @@ class CompileTimeRendererVisitor implements NodeVisitor
             }
 
             if (in_array($name, $this->nonCtrMethodNames)) {
+                $this->isCtrEligible = false;
+            }
+        } elseif ($node instanceof Node\Expr\Variable) {
+            $prefixed = '$'.$node->name;
+
+            if (in_array($node->name, $this->unsafeVariableNames) || in_array($prefixed, $this->unsafeVariableNames)) {
                 $this->isCtrEligible = false;
             }
         }
