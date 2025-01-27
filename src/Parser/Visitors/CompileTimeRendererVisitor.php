@@ -2,16 +2,6 @@
 
 namespace Stillat\Dagger\Parser\Visitors;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Js;
-use Illuminate\Support\Str;
-use League\Uri\Http;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use Stillat\Dagger\Compiler\ComponentState;
@@ -23,16 +13,16 @@ class CompileTimeRendererVisitor implements NodeVisitor
     protected bool $isCtrEligible = true;
 
     protected array $allowedFrameworkClasses = [
-        Str::class,
-        Arr::class,
-        Cache::class,
-        Config::class,
-        Crypt::class,
-        Hash::class,
-        Http::class,
-        Js::class,
-        URL::class,
-        Validator::class,
+        \Illuminate\Support\Str::class,
+        \Illuminate\Support\Arr::class,
+        \Illuminate\Support\Facades\Cache::class,
+        \Illuminate\Support\Facades\Config::class,
+        \Illuminate\Support\Facades\Crypt::class,
+        \Illuminate\Support\Facades\Hash::class,
+        \Illuminate\Support\Facades\Http::class,
+        \Illuminate\Support\Js::class,
+        \Illuminate\Support\Facades\URL::class,
+        \Illuminate\Support\Facades\Validator::class,
     ];
 
     protected array $nonCtrMethodNames = [
