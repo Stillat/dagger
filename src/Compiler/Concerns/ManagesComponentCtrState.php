@@ -14,6 +14,8 @@ trait ManagesComponentCtrState
 
     protected array $ctrUnsafeVariableNames = [];
 
+    protected ?CompileTimeRendererVisitor $ctrVisitor = null;
+
     public function setCtrUnsafeFunctionCalls(array $unsafeFunctionCalls): self
     {
         $this->ctrUnsafeFunctionCalls = $unsafeFunctionCalls;
@@ -36,6 +38,18 @@ trait ManagesComponentCtrState
     public function getCtrUnsafeVariableNameS(): array
     {
         return $this->ctrUnsafeVariableNames;
+    }
+
+    protected function getCtrVisitor(): CompileTimeRendererVisitor
+    {
+        if ($this->ctrVisitor) {
+            return $this->ctrVisitor;
+        }
+
+        return $this->ctrVisitor = new CompileTimeRendererVisitor(
+            $this->ctrUnsafeFunctionCalls,
+            $this->ctrUnsafeVariableNames,
+        );
     }
 
     protected function checkForCtrEligibility(string $originalTemplate, string $compiledTemplate): void
@@ -61,11 +75,9 @@ trait ManagesComponentCtrState
 
         $traverser->removeVisitor($parentingVisitor);
 
-        $ctrVisitor = new CompileTimeRendererVisitor(
-            $this->activeComponent,
-            $this->ctrUnsafeFunctionCalls,
-            $this->ctrUnsafeVariableNames,
-        );
+        $ctrVisitor = $this->getCtrVisitor()
+            ->reset()
+            ->setComponentState($this->activeComponent);
 
         $traverser->addVisitor($ctrVisitor);
         $traverser->traverse($ast);

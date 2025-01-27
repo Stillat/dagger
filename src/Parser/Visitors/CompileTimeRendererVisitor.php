@@ -8,7 +8,7 @@ use Stillat\Dagger\Compiler\ComponentState;
 
 class CompileTimeRendererVisitor implements NodeVisitor
 {
-    protected ComponentState $componentState;
+    protected ?ComponentState $componentState = null;
 
     protected bool $isCtrEligible = true;
 
@@ -23,12 +23,24 @@ class CompileTimeRendererVisitor implements NodeVisitor
 
     protected array $unsafeVariableNames = [];
 
-    public function __construct(ComponentState $componentState, array $unsafeFunctionCalls, array $unsafeVariableNames)
+    public function __construct(array $unsafeFunctionCalls, array $unsafeVariableNames)
+    {
+        $this->unsafeFunctionCalls = $unsafeFunctionCalls;
+        $this->unsafeVariableNames = $unsafeVariableNames;
+    }
+
+    public function reset(): self
+    {
+        $this->isCtrEligible = true;
+
+        return $this;
+    }
+
+    public function setComponentState(ComponentState $componentState): self
     {
         $this->componentState = $componentState;
 
-        $this->unsafeFunctionCalls = $unsafeFunctionCalls;
-        $this->unsafeVariableNames = $unsafeVariableNames;
+        return $this;
     }
 
     protected function isComponentVar($node): bool
