@@ -1,6 +1,6 @@
 <?php
 
-namespace Stillat\Dagger\Parser\Visitors;
+namespace Stillat\Dagger\Ctr;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
@@ -133,6 +133,13 @@ class CompileTimeRendererVisitor implements NodeVisitor
             $name = $this->getStaticCallName($node);
 
             if (! $name) {
+                $this->isCtrEligible = false;
+
+                return;
+            }
+
+            if (! class_exists($name)) {
+                // The class may be available at runtime; disable CTR.
                 $this->isCtrEligible = false;
 
                 return;

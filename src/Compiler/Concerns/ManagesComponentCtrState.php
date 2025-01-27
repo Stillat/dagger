@@ -5,8 +5,8 @@ namespace Stillat\Dagger\Compiler\Concerns;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use Stillat\Dagger\Compiler\Renderer;
+use Stillat\Dagger\Ctr\CompileTimeRendererVisitor;
 use Stillat\Dagger\Parser\PhpParser;
-use Stillat\Dagger\Parser\Visitors\CompileTimeRendererVisitor;
 
 trait ManagesComponentCtrState
 {
