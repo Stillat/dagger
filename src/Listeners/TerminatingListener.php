@@ -19,14 +19,8 @@ class TerminatingListener
         Compiler::cleanup();
 
         foreach ($this->manifest->getTracked() as $rootView => $tracked) {
-            $path = $this->manifest->getStoragePath($rootView);
-
-            if (str_contains($path, '::')) {
-                continue;
-            }
-
             file_put_contents(
-                $path,
+                $this->manifest->getStoragePath($rootView),
                 json_encode($tracked)
             );
         }
