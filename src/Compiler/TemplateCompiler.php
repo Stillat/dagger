@@ -564,7 +564,8 @@ PHP;
             $compiledComponentTemplate = Str::swap($swapVars, $compiledComponentTemplate);
             $compiledComponentTemplate = $this->compileExceptions($compiledComponentTemplate);
 
-            $compiled .= $compiledComponentTemplate;
+            $compiled .= $this->storeComponentBlock($compiledComponentTemplate);
+
             $this->stopCompilingComponent();
         }
 
