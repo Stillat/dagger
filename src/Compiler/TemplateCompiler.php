@@ -622,7 +622,9 @@ PHP;
 
     protected function finalizeCompiledComponent(string $compiledComponentTemplate): string
     {
-        return $this->compileExceptions($compiledComponentTemplate);
+        $compiled = $this->compileExceptions($compiledComponentTemplate);
+
+        return $this->storeComponentBlock($compiled);
     }
 
     public function cleanup(): void

@@ -3,6 +3,7 @@
 namespace Stillat\Dagger\Runtime;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 
 class ViewManifest
 {
@@ -121,6 +122,10 @@ class ViewManifest
 
     public function getStoragePath(string $rootView): string
     {
+        $rootView = Str::swap([
+            ':' => '_',
+        ], $rootView);
+
         return $this->cachePath."_compiler_manifest_{$rootView}.json";
     }
 

@@ -399,7 +399,7 @@ $theAlert = component()->props(['type' => 'info', 'message']);
 
 ## Data Properties / Attributes
 
-To ease development, and provide a familar starting place, the Dagger compiler supports Blade's `@props` directive to help differentiate between which data is a *property* of the component, and what data should be placed inside the component's [attribute bag](https://laravel.com/docs/blade#component-attributes).
+To ease development, and provide a familiar starting place, the Dagger compiler supports Blade's `@props` directive to help differentiate between which data is a *property* of the component, and what data should be placed inside the component's [attribute bag](https://laravel.com/docs/blade#component-attributes).
 
 ```blade
 <!-- /resources/dagger/views/alert.blade.php -->
