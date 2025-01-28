@@ -266,3 +266,41 @@ test('compile time rendering with static methods', function () {
         $this->compile('<c-ctr.static_methods title="The Title" />'),
     );
 });
+
+test('compile time rendering can be disabled on a class  and re-enabled on a specific method', function () {
+    $template = '<c-ctr.disabled_class_enabled_method />';
+    $expected = 'Hello, world.';
+
+    $this->assertSame($expected, $this->render($template));
+    $this->assertSame($expected, $this->compile($template));
+});
+
+test('compile time rendering can be disabled on a class', function () {
+    $template = '<c-ctr.disabled_class />';
+
+    $this->assertStringContainsString(
+        'echo e(\Stillat\Dagger\Tests\CtrDisabledClass::methodOne());',
+        $this->compile($template),
+    );
+
+    $this->assertSame('Hello, world.', $this->render($template));
+});
+
+test('compile time rendering can be enabled on a class', function () {
+    $template = '<c-ctr.enabled_class />';
+    $expected = 'Hello, world.';
+
+    $this->assertSame($expected, $this->render($template));
+    $this->assertSame($expected, $this->compile($template));
+});
+
+test('compile time rendering can be enabled on a class and disabled on a specific method', function () {
+    $template = '<c-ctr.enabled_class_disabled_method />';
+
+    $this->assertStringContainsString(
+        'echo e(\Stillat\Dagger\Tests\CtrEnabledClass::methodTwo());',
+        $this->compile($template),
+    );
+
+    $this->assertSame('Hello, world.', $this->render($template));
+});

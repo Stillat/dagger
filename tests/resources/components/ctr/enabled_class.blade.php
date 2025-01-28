@@ -1,0 +1,1 @@
+{{ \Stillat\Dagger\Tests\CtrEnabledClass::methodOne() }}
