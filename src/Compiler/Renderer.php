@@ -30,7 +30,6 @@ final class Renderer
     {
         $this->compiler = $compiler;
         $this->bladeCompiler = $bladeCompiler;
-        $this->bladeEscaper = new BladeEscaper($bladeCompiler);
     }
 
     public function reset(): void
@@ -210,9 +209,7 @@ final class Renderer
             $replacements[$value] = '__ctrRep'.$varName;
         }
 
-        $template = Str::swap($replacements, $template);
-
-        return $this->bladeEscaper->escape($template);
+        return Str::swap($replacements, $template);
     }
 
     protected function getTemporaryPath(): string
@@ -260,8 +257,7 @@ final class Renderer
         $obLevel = ob_get_level();
         $tmpPath = $this->getTemporaryPath();
         try {
-            $compiled = $this->bladeCompiler->compileString($template);
-            file_put_contents($tmpPath, $compiled);
+            file_put_contents($tmpPath, $template);
 
             ob_start();
             $this->renderFile($tmpPath);
