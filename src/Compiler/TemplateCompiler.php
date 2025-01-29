@@ -649,7 +649,7 @@ PHP;
 
     protected function resetCompilerState(): void
     {
-        $this->ctrDisabled = false;
+        $this->ctrEnabled = true;
         $this->compilerDepth = 0;
     }
 
