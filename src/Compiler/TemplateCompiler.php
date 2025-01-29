@@ -110,6 +110,8 @@ final class TemplateCompiler
 
     protected bool $enabled = true;
 
+    protected bool $ctrEnabled = true;
+
     public function __construct(ViewManifest $manifest, Factory $factory, LineMapper $lineMapper, string $cachePath)
     {
         $this->options = new CompilerOptions;
@@ -286,10 +288,7 @@ final class TemplateCompiler
      */
     public function disableCompileTimeRenderOnStack(): void
     {
-        /** @var ComponentState $state */
-        foreach ($this->componentStack as $state) {
-            $state->canCompileTimeRender = false;
-        }
+        $this->ctrEnabled = false;
     }
 
     protected function compileBoundScopeVariables(): string
@@ -590,7 +589,7 @@ PHP;
 
             $compiledComponentTemplate = Str::swap($swapVars, $compiledComponentTemplate);
 
-            if (! $this->renderer->canRender($this->activeComponent)) {
+            if (! $this->ctrEnabled || ! $this->renderer->canRender($this->activeComponent)) {
                 $compiled .= $this->finalizeCompiledComponent($compiledComponentTemplate);
             } else {
                 $this->enabled = false;
@@ -650,6 +649,7 @@ PHP;
 
     protected function resetCompilerState(): void
     {
+        $this->ctrDisabled = false;
         $this->compilerDepth = 0;
     }
 

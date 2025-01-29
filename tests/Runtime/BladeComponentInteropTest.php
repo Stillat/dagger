@@ -137,11 +137,7 @@ After
 Before
 The Default.
 After
-
 EXPECTED;
 
-    $this->assertSame(
-        $expected,
-        $this->render($template)
-    );
+    $this->assertSame($expected, $this->render($template));
 });

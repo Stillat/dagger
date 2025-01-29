@@ -304,3 +304,28 @@ test('compile time rendering can be enabled on a class and disabled on a specifi
 
     $this->assertSame('Hello, world.', $this->render($template));
 });
+
+test('satisfied roots do not precompile if nested components are not satisfied', function () {
+    $expected = <<<'EXPECTED'
+Root: The Title
+
+
+Child One: Child One
+
+
+
+Child Two: Child One to child two
+EXPECTED;
+
+    $template = <<<'BLADE'
+<c-ctr.root title="The Title" />
+BLADE;
+
+    $compiled = $this->compile($template);
+
+    $this->assertStringContainsString('echo e($title)', $compiled);
+
+    $this->assertNotSame($expected, $compiled);
+
+    $this->assertSame($expected, trim($this->render($template)));
+});
