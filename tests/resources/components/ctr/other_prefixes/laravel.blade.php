@@ -1,0 +1,2 @@
+{{ 'The String' }}
+<x-alert />

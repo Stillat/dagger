@@ -329,3 +329,31 @@ BLADE;
 
     $this->assertSame($expected, trim($this->render($template)));
 });
+
+test('Laravel Blade component prefix disables compile time rendering', function () {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.other_prefixes.laravel />')
+    );
+});
+
+test('Flux component prefix disables compile time rendering', function () {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.other_prefixes.flux />')
+    );
+});
+
+test('Livewire component prefix disables compile time rendering', function () {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.other_prefixes.livewire />')
+    );
+});
+
+test('Other component prefix disables compile time rendering', function () {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.other_prefixes.other />')
+    );
+});

@@ -111,18 +111,6 @@ final class Renderer
         return true;
     }
 
-    /**
-     * @internal
-     */
-    public static function containsOtherComponents(string $template): bool
-    {
-        return Str::contains($template, [
-            '<x-', '<x:',
-            '<livewire-', '<livewire:',
-            '<flux-', '<flux:',
-        ]);
-    }
-
     public function canRender(ComponentState $componentState): bool
     {
         if (isset($this->disabledComponents[$componentState->componentPath])) {
