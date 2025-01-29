@@ -24,8 +24,6 @@ final class Renderer
 
     protected BladeCompiler $bladeCompiler;
 
-    protected BladeEscaper $bladeEscaper;
-
     public function __construct(TemplateCompiler $compiler, BladeCompiler $bladeCompiler)
     {
         $this->compiler = $compiler;
