@@ -32,6 +32,7 @@ class CompileTimeRendererVisitor implements NodeVisitor
         Node\Expr\Eval_::class,
         Node\Expr\Include_::class,
         Node\Expr\Exit_::class,
+        Node\Expr\ShellExec::class,
     ];
 
     protected array $nonCtrMethodNames = [
