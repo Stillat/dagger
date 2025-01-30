@@ -31,6 +31,7 @@ class CompileTimeRendererVisitor implements NodeVisitor
     protected array $disabledExpressions = [
         Node\Expr\Eval_::class,
         Node\Expr\Include_::class,
+        Node\Expr\Exit_::class,
     ];
 
     protected array $nonCtrMethodNames = [

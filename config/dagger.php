@@ -10,7 +10,8 @@ return [
             'now', 'time', 'date', 'env', 'getenv', 'cookie',
             'request', 'session', 'dd', 'dump', 'var_dump',
             'debug_backtrace', 'phpinfo', 'extract',
-            'get_defined_vars', 'parse_str',
+            'get_defined_vars', 'parse_str', 'abort', 'abort_if',
+            'abort_unless',
         ],
     ],
 ];

@@ -377,5 +377,12 @@ test('function disables compile time rendering', function ($functionName) {
     'request', 'session', 'dd', 'dump', 'var_dump',
     'debug_backtrace', 'phpinfo', 'include', 'include_once',
     'require', 'require_once', 'eval', 'extract',
-    'get_defined_vars', 'parse_str',
+    'get_defined_vars', 'parse_str', 'abort', 'abort_if', 'abort_unless',
 ]);
+
+test('exit disables compile time rendering', function () {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.disabled.exit />')
+    );
+});
