@@ -28,6 +28,11 @@ class CompileTimeRendererVisitor implements NodeVisitor
         \Illuminate\Support\Facades\Validator::class,
     ];
 
+    protected array $disabledExpressions = [
+        Node\Expr\Eval_::class,
+        Node\Expr\Include_::class,
+    ];
+
     protected array $nonCtrMethodNames = [
         'Stillat\Dagger\component',
         'Stillat\Dagger\render',
@@ -162,6 +167,8 @@ class CompileTimeRendererVisitor implements NodeVisitor
             }
 
             $this->isCtrEligible = $this->isCtrAllowed($reflectionClass, $reflectionClass->getMethod($methodName));
+        } elseif (in_array(get_class($node), $this->disabledExpressions)) {
+            $this->isCtrEligible = false;
         }
     }
 

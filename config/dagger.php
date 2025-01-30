@@ -7,17 +7,10 @@ return [
             '$_ENV', '$_COOKIE', '$http_response_header', '$argc', '$argv',
         ],
         'unsafe_functions' => [
-            // Date/Time related.
-            'now', 'time', 'date',
-
-            // Environment related.
-            'env', 'getenv',
-
-            // Request related.
-            'cookie', 'request', 'session',
-
-            // Debugging related.
-            'dd', 'dump', 'var_dump', 'debug_backtrace', 'phpinfo',
+            'now', 'time', 'date', 'env', 'getenv', 'cookie',
+            'request', 'session', 'dd', 'dump', 'var_dump',
+            'debug_backtrace', 'phpinfo', 'extract',
+            'get_defined_vars', 'parse_str',
         ],
     ],
 ];

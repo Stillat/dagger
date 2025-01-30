@@ -357,3 +357,25 @@ test('Other component prefix disables compile time rendering', function () {
         $this->compile('<c-ctr.other_prefixes.other />')
     );
 });
+
+test('var disables compile time rendering', function ($varName) {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.disabled.var_'.$varName.' />')
+    );
+})->with([
+    'argc', 'argv', 'cookie', 'env', 'files', 'get', 'post', 'request', 'session',
+]);
+
+test('function disables compile time rendering', function ($functionName) {
+    $this->assertStringContainsString(
+        "echo e('The String');",
+        $this->compile('<c-ctr.disabled.func_'.$functionName.' />')
+    );
+})->with([
+    'now', 'time', 'date', 'env', 'getenv', 'cookie',
+    'request', 'session', 'dd', 'dump', 'var_dump',
+    'debug_backtrace', 'phpinfo', 'include', 'include_once',
+    'require', 'require_once', 'eval', 'extract',
+    'get_defined_vars', 'parse_str',
+]);
