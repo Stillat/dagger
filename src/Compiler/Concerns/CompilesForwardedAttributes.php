@@ -16,6 +16,12 @@ trait CompilesForwardedAttributes
         $paramsToKeep = [];
 
         foreach ($node->parameters as $param) {
+            if ($this->isCacheParam($param)) {
+                $compilerParams[] = $param;
+
+                continue;
+            }
+
             if (Str::startsWith($param->name, '##')) {
                 $param->name = mb_substr($param->name, 1);
                 $paramsToKeep[] = $param;
