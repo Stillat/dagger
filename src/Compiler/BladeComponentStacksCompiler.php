@@ -25,7 +25,8 @@ PHP;
 <?php if (isset($varName) && $varName === true) { \Stillat\Dagger\Facades\ComponentEnv::pop(null); unset($varName); } ?>
 PHP;
 
-        for ($i = 0; $i < count($lines); $i++) {
+        $lineCount = count($lines);
+        for ($i = 0; $i < $lineCount; $i++) {
             $line = $lines[$i];
             $trimmedLine = trim($line);
 
@@ -34,8 +35,16 @@ PHP;
                     $newLines[] = $line;
                     $i++;
 
+                    if ($i >= $lineCount) {
+                        return $template;
+                    }
+
                     $line = $lines[$i];
                     $trimmedLine = trim($line);
+
+                    if (str_ends_with($trimmedLine, '##END-COMPONENT-CLASS##')) {
+                        return $template;
+                    }
                 }
                 $newLines[] = '<?php if (isset($component)) { \Stillat\Dagger\Facades\ComponentEnv::pushRaw($component); } ?>';
                 $newLines[] = $line;
