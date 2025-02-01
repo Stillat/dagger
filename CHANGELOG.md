@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.0.6](https://github.com/Stillat/dagger/compare/v1.0.5...v1.0.6) - 2025-01-31
+
+- Corrects an issue where Blade stack compilation results in array index errors
+
 ## [v1.0.5](https://github.com/Stillat/dagger/compare/v1.0.4...v1.0.5) - 2025-01-27
 
 - `@aware` variables are automatically removed from the attribute bag, without needing to redefine them in `@props`
