@@ -5,6 +5,7 @@ namespace Stillat\Dagger\Tests;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
 use Orchestra\Testbench\TestCase;
+use Stillat\Dagger\Compiler\BladeComponentStacksCompiler;
 use Stillat\Dagger\Compiler\ComponentState;
 use Stillat\Dagger\Exceptions\Mapping\LineMapper;
 use Stillat\Dagger\Facades\Compiler;
@@ -63,5 +64,10 @@ class CompilerTestCase extends TestCase
         $parser->setComponentNamespaces(['c']);
 
         return $parser->parse(null, $template, 'random');
+    }
+
+    protected function compileStacks(string $template): string
+    {
+        return (new BladeComponentStacksCompiler)->compile($template);
     }
 }
