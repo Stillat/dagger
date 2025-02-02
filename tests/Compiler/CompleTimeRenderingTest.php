@@ -386,3 +386,42 @@ test('exit disables compile time rendering', function () {
         $this->compile('<c-ctr.disabled.exit />')
     );
 });
+
+test('stencils can disable compile time rendering', function () {
+    $template = <<<'BLADE'
+<c-stencils.basic>
+    <c-stencil:the_name>
+        <?php $theVar = 'Value'; ?>
+        {{ $theVar }}
+    </c-stencil:the_name>
+</c-stencils.basic>
+BLADE;
+
+    $expected = <<<'EXPECTED'
+Before
+        Value
+After
+EXPECTED;
+
+    $this->assertSame($expected, $this->compile($template));
+    $this->assertSame($expected, $this->render($template));
+
+    $template = <<<'BLADE'
+<c-stencils.basic>
+    <c-stencil:the_name>
+        <?php $theVar = 'Value'; $theVars = get_defined_vars(); ?>
+        {{ $theVar }}
+    </c-stencil:the_name>
+</c-stencils.basic>
+BLADE;
+
+    $compiled = $this->compile($template);
+
+    $this->assertStringContainsString(
+        'echo e($theVar);',
+        $compiled,
+    );
+
+    $this->assertNotSame($expected, $compiled);
+    $this->assertSame($expected, $this->render($template));
+});
