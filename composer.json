@@ -15,13 +15,13 @@
         }
     },
     "require": {
-        "laravel/framework": "^11.24",
+        "laravel/framework": "^11.23",
         "stillat/blade-parser": "^1.10.3",
         "nikic/php-parser": "^5",
         "symfony/var-exporter": "^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0",
+        "orchestra/testbench": "^9.2",
         "brianium/paratest": "*",
         "pestphp/pest": "^2",
         "laravel/pint": "^1.13",

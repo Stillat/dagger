@@ -109,7 +109,7 @@ EXPECTED;
     $this->assertSame($expected, $this->render($template));
     $this->assertSame($expected, $this->render($template));
     $this->assertSame($expected, $this->render($template));
-})->skip();
+});
 
 test('dynamic cache keys', function () {
     $template = <<<'BLADE'
