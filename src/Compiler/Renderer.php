@@ -62,13 +62,15 @@ final class Renderer
         return false;
     }
 
-    protected function attributesSatisfyProps(ComponentNode $component, array $propNames): bool
+    protected function attributesSatisfyProps(ComponentState $component, array $propNames): bool
     {
-        $attributeNames = collect($component->parameters)
+        $attributeNames = collect($component->node->parameters)
             ->map(fn (ParameterNode $param) => $param->materializedName)
             ->unique()
             ->flip()
             ->all();
+
+        $defaultProps = array_flip(array_keys($component->getPropDefaults()));
 
         foreach ($propNames as $propName) {
             if (isset($this->pendingProps[$propName])) {
@@ -77,6 +79,10 @@ final class Renderer
             }
 
             if (isset($attributeNames[$propName])) {
+                continue;
+            }
+
+            if (isset($defaultProps[$propName])) {
                 continue;
             }
 
@@ -178,7 +184,7 @@ final class Renderer
             return true;
         }
 
-        if ($this->attributesSatisfyProps($componentState->node, $componentState->getAllPropNames())) {
+        if ($this->attributesSatisfyProps($componentState, $componentState->getAllPropNames())) {
             return true;
         }
 
