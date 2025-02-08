@@ -5,6 +5,7 @@ namespace Stillat\Dagger\Compiler\Concerns;
 use Illuminate\Support\Str;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Nodes\Components\ParameterNode;
+use Stillat\Dagger\Compiler\ParameterFactory;
 use Stillat\Dagger\Facades\SourceMapper;
 use Stillat\Dagger\Support\Utils;
 
@@ -75,9 +76,24 @@ trait CompilesDynamicComponents
         return $dynamicComponentPath;
     }
 
-    protected function compileDynamicComponentScaffolding(ComponentNode $component, string $viewPath): string
+    protected function compileCircularComponent(ComponentNode $node, string $currentViewPath): string
     {
-        $dynamicComponentName = Utils::makeRandomString();
+        $circularComponent = clone $node;
+        $circularComponent->name = 'delegate-component';
+        $circularComponent->parameters[] = ParameterFactory::parameterFromText('component="'.$node->tagName.'"');
+
+        return $this->compileDynamicComponentScaffolding(
+            $circularComponent,
+            $currentViewPath,
+            $this->getComponentHash($node)
+        );
+    }
+
+    protected function compileDynamicComponentScaffolding(ComponentNode $component, string $viewPath, ?string $dynamicComponentName = null): string
+    {
+        if (! $dynamicComponentName) {
+            $dynamicComponentName = Utils::makeRandomString();
+        }
 
         $dynamicComponent = clone $component;
         $dynamicComponent->parameters = collect($dynamicComponent->parameters)
@@ -97,7 +113,7 @@ trait CompilesDynamicComponents
             );
         }
 
-        $contentDelimiter = '[DYNAMIC::COMPONENT::CONTENT'.Utils::makeRandomString().']';
+        $contentDelimiter = '[DYNAMIC::COMPONENT::CONTENT'.md5($dynamicComponentName).']';
 
         // Ensure line numbers remain consistent.
         $dynamicTemplate = str_repeat($this->newlineStyle, ($component->position?->startLine ?? 1) - 1);
