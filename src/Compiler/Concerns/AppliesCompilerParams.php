@@ -19,6 +19,10 @@ trait AppliesCompilerParams
 
     protected function isValidCompilerParam(ParameterNode $param): bool
     {
+        if ($this->isCacheParam($param)) {
+            return true;
+        }
+
         if (in_array($param->type, $this->invalidCompilerParamTypes, true)) {
             return false;
         }
@@ -37,6 +41,14 @@ trait AppliesCompilerParams
     {
         if (count($compilerParams) === 0) {
             return;
+        }
+
+        $cacheParam = collect($compilerParams)
+            ->where(fn (ParameterNode $param) => $this->isCacheParam($param))
+            ->first();
+
+        if ($cacheParam) {
+            $this->applyCacheParam($component, $cacheParam);
         }
 
         $compilerParams = collect($compilerParams)

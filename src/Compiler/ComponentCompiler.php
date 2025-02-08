@@ -8,6 +8,7 @@ use PhpParser\PrettyPrinter\Standard;
 use Stillat\Dagger\Compiler\ComponentStages\ExtractsRenderCalls;
 use Stillat\Dagger\Compiler\ComponentStages\RemoveUseStatements;
 use Stillat\Dagger\Compiler\ComponentStages\ResolveNamespaces;
+use Stillat\Dagger\Compiler\ComponentStages\RewriteFunctions;
 use Stillat\Dagger\Compiler\Concerns\CompilesPhp;
 use Stillat\Dagger\Parser\PhpParser;
 
@@ -42,6 +43,7 @@ class ComponentCompiler
                 ResolveNamespaces::class,
                 RemoveUseStatements::class,
                 new ExtractsRenderCalls($this),
+                RewriteFunctions::class,
             ])
             ->thenReturn();
 

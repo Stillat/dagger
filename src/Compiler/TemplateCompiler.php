@@ -15,6 +15,7 @@ use Stillat\BladeParser\Nodes\LiteralNode;
 use Stillat\BladeParser\Parser\DocumentParser;
 use Stillat\Dagger\Compiler\Concerns\AppliesCompilerParams;
 use Stillat\Dagger\Compiler\Concerns\CompilesBasicComponents;
+use Stillat\Dagger\Compiler\Concerns\CompilesCache;
 use Stillat\Dagger\Compiler\Concerns\CompilesCompilerDirectives;
 use Stillat\Dagger\Compiler\Concerns\CompilesComponentDetails;
 use Stillat\Dagger\Compiler\Concerns\CompilesDynamicComponents;
@@ -40,6 +41,7 @@ final class TemplateCompiler
 
     use AppliesCompilerParams,
         CompilesBasicComponents,
+        CompilesCache,
         CompilesCompilerDirectives,
         CompilesComponentDetails,
         CompilesDynamicComponents,
@@ -576,7 +578,7 @@ PHP;
             $compiledComponentTemplate = Str::swap($swapVars, $compiledComponentTemplate);
             $compiledComponentTemplate = $this->compileExceptions($compiledComponentTemplate);
 
-            $compiled .= $this->storeComponentBlock($compiledComponentTemplate);
+            $compiled .= $this->finalizeCompiledComponent($compiledComponentTemplate);
 
             $this->stopCompilingComponent();
         }
@@ -588,6 +590,15 @@ PHP;
         }
 
         return $compiled;
+    }
+
+    protected function finalizeCompiledComponent(string $compiled): string
+    {
+        if ($this->activeComponent->cacheProperties != null) {
+            $compiled = $this->compileCache($compiled);
+        }
+
+        return $this->storeComponentBlock($compiled);
     }
 
     public function cleanup(): void
