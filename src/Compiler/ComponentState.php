@@ -5,6 +5,7 @@ namespace Stillat\Dagger\Compiler;
 use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
+use Stillat\Dagger\Cache\CacheProperties;
 use Stillat\Dagger\ComponentOptions;
 use Stillat\Dagger\Support\Utils;
 
@@ -77,6 +78,8 @@ class ComponentState
      * We will keep it false by default, and only enable this if needed.
      */
     public bool $isCtrEligible = false;
+
+    public ?CacheProperties $cacheProperties = null;
 
     public function __construct(
         public ?ComponentNode $node,

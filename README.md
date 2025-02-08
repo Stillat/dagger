@@ -44,6 +44,10 @@ The main visual difference when working with Dagger components is the use of the
   - [Shorthand Validation Rules](#shorthand-validation-rules)
 - [Compiler Attributes](#compiler-attributes)
   - [Escaping Compiler Attributes](#escaping-compiler-attributes)
+- [Caching Components](#caching-components)
+  - [Dynamic Cache Keys](#dynamic-cache-keys)
+  - [Specifying the Cache Store](#specifying-the-cache-store)
+  - [Stale While Revalidate/Flexible Caching](#stale-while-revalidate-flexible-cache)
 - [Component Name](#component-name)
 - [Component Depth](#component-depth)
 - [Attribute Forwarding](#attribute-forwarding)
@@ -111,10 +115,6 @@ Dagger components are also interopable with Blade components, and will add thems
 ### Why are there JSON files in my compiled view folder?
 
 This is due to the View Manifest. The Dagger compiler and runtime will store which component files were used to create the final output in a JSON file, which is later used for cache-invalidation. The Dagger compiler inlines component templates, which prevents typical file-based cache invalidation from working; the View Manifest solves that problem.
-
-### Are circular component hierarchies supported?
-
-A circular component hierarchy is one where Component A includes Component B, which might conditionally include Component A again. Because the compiler inlines components, circular components are not supported and may result in infinite loops.
 
 ### Why build all of this?
 
@@ -661,6 +661,97 @@ In general, you should avoid using props or attributes beginning with `#` as the
 - `#classdef`
 - `#cache`
 - `#precompile`
+
+## Caching Components
+
+You may cache the output of any Dagger component using the `#cache` compiler attribute. This attribute utilizes Laravel's [Cache](https://laravel.com/docs/cache) feature, and provides ways to customize cache keys, expirations, and the cache store.
+
+For example, imagine we had a report component that we'd like to cache:
+
+```blade
+<!-- /resources/dagger/views/report.blade.php -->
+
+@php
+    // Some expensive report logic.
+@endphp
+```
+
+Instead of manually capturing output, or adding caching in other locations, we can simply cache the output of our component call like so:
+
+```blade
+<c-report #cache="the-cache-key" />
+```
+
+Now, the output of the component will be cached forever using the `the-cache-key` string as the cache key.
+
+We may also specify a different time-to-live by specifying the number of seconds the cached output is valid:
+
+```blade
+<c-report #cache.300="the-cache-key" />
+```
+
+You may also use a shorthand notation to calculate the time-to-live in seconds. For example, if we'd like to have the cache expire ten minutes from the time the component was first rendered we could use the value `10m`:
+
+```blade
+<c-report
+    #cache.10m="the-cache-key"
+/>
+```
+
+Alternatively, we could also have the cache expire in 1 hour, 15 minutes, and 32 seconds:
+
+```blade
+<c-report
+    #cache=1h15m32s="the-cache-key"
+/>
+```
+
+The total number of seconds is calculated dynamically by adding the desired "date parts" to the current time and *then* calculating the number of seconds to use.
+
+The following table lists the possible suffixes that may be used:
+
+| Suffix | Description | Example |
+|---|---|---|
+| y | Year | 1y |
+| mo | Month | 1mo |
+| w | Week | 1w |
+| d | Day | 2d |
+| h | Hour | 1h |
+| m | Minute | 30m |
+| s | Seconds | 15s |
+
+### Dynamic Cache Keys
+
+You may create dynamic cache keys by prefixing the `#cache` attribute with the `:` character:
+
+```blade
+<c-profile
+    :$user
+    :#cache.forever="'user-profile'.$user->id"
+/>
+```
+
+### Specifying the Cache Store
+
+You may use a specific cache store by providing the desired cache store's name as the final modifier to the `#cache` attribute.
+
+The following examples would cache the output for 30 seconds on different cache stores:
+
+```blade
+<c-first_component #cache.300.array="first-key" />
+
+<c-second_component #cache.300.file="second-key" />
+```
+
+### Stale While Revalidate (Flexible Cache)
+
+You may leverage Laravel's [stale-while-revalidate pattern implementation](https://laravel.com/docs/11.x/cache#swr) using the `flexible` cache modifier. This modifier accepts two values: the number of seconds the cache is considered fresh, and the second value determines how long the cached contents can be served as stale before recalculation is necessary.
+
+```blade
+<c-report
+    #cache.flexible:5:10="the-cache-key"
+/>
+```
 
 ## Component Name
 

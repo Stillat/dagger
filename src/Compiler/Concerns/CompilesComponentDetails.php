@@ -33,6 +33,22 @@ trait CompilesComponentDetails
         throw new InvalidArgumentException('Cannot register [x] as a component prefix.');
     }
 
+    protected function getComponentHash(ComponentNode $node): string
+    {
+        $value = $node->content;
+
+        if ($node->isClosedBy != null) {
+            $value .= $node->innerDocumentContent;
+        }
+
+        return md5($value);
+    }
+
+    protected function getComponentName(ComponentNode $node): string
+    {
+        return "{$node->componentPrefix}:{$node->tagName}";
+    }
+
     /**
      * @throws InvalidArgumentException
      */

@@ -15,6 +15,7 @@ use Stillat\BladeParser\Nodes\LiteralNode;
 use Stillat\BladeParser\Parser\DocumentParser;
 use Stillat\Dagger\Compiler\Concerns\AppliesCompilerParams;
 use Stillat\Dagger\Compiler\Concerns\CompilesBasicComponents;
+use Stillat\Dagger\Compiler\Concerns\CompilesCache;
 use Stillat\Dagger\Compiler\Concerns\CompilesCompilerDirectives;
 use Stillat\Dagger\Compiler\Concerns\CompilesComponentDetails;
 use Stillat\Dagger\Compiler\Concerns\CompilesDynamicComponents;
@@ -43,6 +44,7 @@ final class TemplateCompiler
 
     use AppliesCompilerParams,
         CompilesBasicComponents,
+        CompilesCache,
         CompilesCompilerDirectives,
         CompilesComponentDetails,
         CompilesDynamicComponents,
@@ -73,6 +75,8 @@ final class TemplateCompiler
     protected ViewManifest $manifest;
 
     protected array $componentStack = [];
+
+    protected array $activeComponentNames = [];
 
     protected array $componentPath = [];
 
@@ -261,6 +265,7 @@ final class TemplateCompiler
         $this->applyCompilerParameters($state, $compilerParams);
 
         $this->componentStack[] = $state;
+        $this->activeComponentNames[] = $this->getComponentName($state->node);
         $this->activeComponent = $state;
 
         $this->componentPath[] = $state->compilerId;
@@ -270,6 +275,7 @@ final class TemplateCompiler
     {
         array_pop($this->componentStack);
         array_pop($this->componentPath);
+        array_pop($this->activeComponentNames);
 
         if (count($this->componentStack) > 0) {
             $this->activeComponent = $this->componentStack[array_key_last($this->componentStack)];
@@ -413,6 +419,14 @@ final class TemplateCompiler
                 $this->decrementCompilerDepth();
 
                 return $compiled;
+            }
+
+            $currentComponentName = $this->getComponentName($node);
+
+            if (in_array($currentComponentName, $this->activeComponentNames)) {
+                $compiled .= $this->compileCircularComponent($node, $currentViewPath ?? '');
+
+                continue;
             }
 
             $varSuffix = Utils::makeRandomString();
@@ -619,9 +633,13 @@ PHP;
         return $compiled;
     }
 
-    protected function finalizeCompiledComponent(string $compiledComponentTemplate): string
+    protected function finalizeCompiledComponent(string $compiled): string
     {
-        $compiled = $this->compileExceptions($compiledComponentTemplate);
+        $compiled = $this->compileExceptions($compiled);
+
+        if ($this->activeComponent->cacheProperties != null) {
+            $compiled = $this->compileCache($compiled);
+        }
 
         return $this->storeComponentBlock($compiled);
     }
