@@ -15,7 +15,7 @@
         }
     },
     "require": {
-        "laravel/framework": "^11.9",
+        "laravel/framework": "^11.23",
         "stillat/blade-parser": "^1.10.3",
         "nikic/php-parser": "^5",
         "symfony/var-exporter": "^6.0"
