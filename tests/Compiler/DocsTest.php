@@ -540,3 +540,32 @@ EXPECTED;
         $this->render($template)
     );
 });
+
+test('ctr alert example', function () {
+    $template = <<<'BLADE'
+<c-alert message="The awesome message" />
+BLADE;
+
+    $expected = <<<'EXPECTED'
+<div class="alert alert-info">
+    The awesome message
+</div>
+EXPECTED;
+
+    $this->assertSame($expected, $this->compile($template));
+    $this->assertSame($expected, $this->render($template));
+
+    $template = <<<'BLADE'
+<c-alert :$message />
+BLADE;
+
+    $this->assertNotSame(
+        $expected,
+        $this->compile($template),
+    );
+
+    $this->assertSame(
+        $expected,
+        $this->render($template, ['message' => 'The awesome message'])
+    );
+});

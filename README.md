@@ -66,6 +66,7 @@ The main visual difference when working with Dagger components is the use of the
 - [Dynamic Components](#dynamic-components)
 - [Custom Component Paths and Namespaces](#custom-component-paths-and-namespaces)
   - [Blade Component Prefix](#blade-component-prefix)
+- [Compile Time Rendering](#compile-time-rendering)
 - [The View Manifest](#the-view-manifest)
 - [License](#license)
 
@@ -1297,6 +1298,53 @@ Custom components can leverage all features of the Dagger compiler using their c
 ### Blade Component Prefix
 
 You are **not** allowed to register the prefix `x` with the Dagger compiler; attempting to do so will raise an `InvalidArgumentException`.
+
+## Compile Time Rendering
+
+The Dagger compiler contains a subsystem known as the Compile Time Renderer, or CTR. This checks to see if all the props on a component are resolvable at runtime; if so, it may elect to compile the component at runtime and insert the pre-rendered results into Blade's compiled output.
+
+This feature has a number of internal safe guards, and here are a few of the things that will internally disable this feature:
+
+- Dynamic/interpolated variable references
+- Using Mixins
+- Most static method calls
+- Referencing PHP's [superglobals](https://php.net/superglobals), such as `$_GET` or `$_POST`
+- Using debugging-related functions in a component, such as `dd`, `dump`, `var_dump`, etc.
+- Calling functions such as `time`, `now`, or `date`
+- Enabling the Attribute Cache on a component
+- Components with slots
+
+Imagine we have the following alert component:
+
+```blade
+<!-- /resources/dagger/views/alert.blade.php -->
+
+@props(['type' => 'info', 'message'])
+
+<div {{ $attributes->merge(['class' => 'alert alert-'.$type]) }}>
+    {{ $message }}
+</div>
+```
+
+If we were to call the alert component like so:
+
+```blade
+<c-alert message="My awesome message" />
+```
+
+The compiler would detect that all props are resolvable, and the following would be emitted in the compiled Blade output:
+
+```html
+<div class="alert alert-info">
+    The awesome message
+</div>
+```
+
+However, if we were to call our component like so, the compiler would not attempt to render the component at compile time:
+
+```blade
+<c-alert :$message />
+```
 
 ## The View Manifest
 
