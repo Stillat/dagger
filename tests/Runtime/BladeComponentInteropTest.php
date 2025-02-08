@@ -79,8 +79,6 @@ BLADE;
 <div id="theParent">
     The Title
 </div>
-
-
 Another Title
 EXPECTED;
 
@@ -128,6 +126,7 @@ After
 Before
 The Default.
 After
+
 Before
 Some changed content #1
         <div id="theParent">
@@ -138,10 +137,8 @@ After
 Before
 The Default.
 After
+
 EXPECTED;
 
-    $this->assertSame(
-        $expected,
-        $this->render($template)
-    );
+    $this->assertSame($expected, $this->render($template));
 });

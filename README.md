@@ -70,6 +70,10 @@ The main visual difference when working with Dagger components is the use of the
 - [Dynamic Components](#dynamic-components)
 - [Custom Component Paths and Namespaces](#custom-component-paths-and-namespaces)
   - [Blade Component Prefix](#blade-component-prefix)
+- [Compile Time Rendering](#compile-time-rendering)
+  - [Disabling Compile Time Rendering on a Component](#disabling-compile-time-rendering-on-a-component)
+  - [Enabling/Disabling Optimizations on Classes or Methods](#enablingdisabling-optimizations-on-classes-or-methods)
+  - [Notes on Compile Time Rendering](#notes-on-compile-time-rendering)
 - [The View Manifest](#the-view-manifest)
 - [License](#license)
 
@@ -1388,6 +1392,151 @@ Custom components can leverage all features of the Dagger compiler using their c
 ### Blade Component Prefix
 
 You are **not** allowed to register the prefix `x` with the Dagger compiler; attempting to do so will raise an `InvalidArgumentException`.
+
+## Compile Time Rendering
+
+The Dagger compiler contains a subsystem known as the Compile Time Renderer, or CTR. This checks to see if all the props on a component are resolvable at runtime; if so, it may elect to compile the component at runtime and insert the pre-rendered results into Blade's compiled output.
+
+This feature has a number of internal safe guards, and here are a few of the things that will internally disable this feature:
+
+- Dynamic/interpolated variable references
+- Using Mixins
+- Most static method calls
+- Referencing PHP's [superglobals](https://php.net/superglobals), such as `$_GET` or `$_POST`
+- Using debugging-related functions in a component, such as `dd`, `dump`, `var_dump`, etc.
+- Calling functions such as `time`, `now`, or `date`
+- Enabling the Attribute Cache on a component
+- Components with slots
+
+Imagine we have the following alert component:
+
+```blade
+<!-- /resources/dagger/views/alert.blade.php -->
+
+@props(['type' => 'info', 'message'])
+
+<div {{ $attributes->merge(['class' => 'alert alert-'.$type]) }}>
+    {{ $message }}
+</div>
+```
+
+If we were to call the alert component like so:
+
+```blade
+<c-alert message="My awesome message" />
+```
+
+The compiler would detect that all props are resolvable, and the following would be emitted in the compiled Blade output:
+
+```html
+<div class="alert alert-info">
+    The awesome message
+</div>
+```
+
+However, if we were to call our component like so, the compiler would not attempt to render the component at compile time:
+
+```blade
+<c-alert :$message />
+```
+
+### Disabling Compile Time Rendering on a Component
+
+The CTR system should be transparent from a component author's point-of-view, however, if the rare event that you need to disable compiler optimizations, you may do so using the `compiler` helper method:
+
+```blade
+<!-- /resources/dagger/views/the_component.blade.php -->
+@php
+    \Stillat\Dagger\component()
+        ->props(['title'])
+        ->compiler(
+            allowOptimizations: false
+        );
+@endphp
+
+{{ $title }}
+```
+
+If you find yourself disabling optimizations on a component, please open a discussion or an issue with details on which behaviors led to that decision.
+
+### Enabling/Disabling Optimizations on Classes or Methods
+
+The CTR system will aggressively disable itself whenever it detects static method calls within component templates. You may choose to mark these methods as safe using the `EnableOptimization` attribute:
+
+```php
+<?php
+
+namespace App;
+
+use Stillat\Dagger\Compiler\EnableOptimization;
+
+class MyAwesomeClass
+{
+
+    #[EnableOptimization]
+    public static function myHelper()
+    {
+
+    }
+
+}
+```
+
+You may also mark an entire class as safe for optimizations by applying the attribute to the class instead:
+
+```php
+<?php
+
+namespace App;
+
+use Stillat\Dagger\Compiler\EnableOptimization;
+
+#[EnableOptimization]
+class MyAwesomeClass
+{
+
+    public static function myHelper()
+    {
+
+    }
+
+}
+```
+
+If you'd like to *disable* optimizations on a class or method explicitly, you may use the `DisableOptimization` attribute instead.
+
+The following example would enable optimizations on the entire class but disable it on a specific method:
+
+```php
+<?php
+
+namespace App;
+
+use Stillat\Dagger\Compiler\DisableOptimization;
+use Stillat\Dagger\Compiler\EnableOptimization;
+
+#[EnableOptimization]
+class MyAwesomeClass
+{
+
+    public static function methodOne()
+    {
+        // Optimization allowed.
+    }
+
+    #[DisableOptimization]
+    public static function methodTwo()
+    {
+        // Optimization not allowed.
+    }
+
+}
+```
+
+### Notes on Compile Time Rendering
+
+- You should *never* attempt to force a component to render at compile time, outside of applying the `EnableOptimization` or `DisableOptimization` attributes to your own helper methods
+- If an exception is raised while rendering a component at compile time, CTR will be disabled for that component and the compiler will revert to normal behavior
 
 ## The View Manifest
 

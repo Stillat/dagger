@@ -41,12 +41,25 @@ class ServiceProvider extends IlluminateServiceProvider
                 $app['config']['view.compiled']
             );
 
+            $ctrConfig = config('dagger.ctr') ?? [];
+
+            $ctrVisitor = $compiler->getCtrVisitor();
+            $ctrVisitor->setUnsafeFunctionCalls($ctrConfig['unsafe_functions'] ?? [])
+                ->setUnsafeVariableNames($ctrConfig['unsafe_variables'] ?? [])
+                ->setAppAliases(config('app.aliases') ?? []);
+
             return $compiler;
         });
     }
 
     public function boot()
     {
+        $this->publishes([
+            __DIR__.'/../config/dagger.php' => config_path('dagger.php'),
+        ]);
+
+        $this->mergeConfigFrom(__DIR__.'/../config/dagger.php', 'dagger');
+
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'dagger');
 
         if ($this->app->runningInConsole()) {

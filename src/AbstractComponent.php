@@ -4,6 +4,7 @@ namespace Stillat\Dagger;
 
 use Illuminate\Support\Fluent;
 use Illuminate\View\ComponentAttributeBag;
+use Stillat\Dagger\Exceptions\RuntimeException;
 use Stillat\Dagger\Parser\ComponentTap;
 use Stillat\Dagger\Runtime\SlotContainer;
 
@@ -95,6 +96,14 @@ abstract class AbstractComponent
     abstract public function trimOutput(): static;
 
     abstract public function cache(): static;
+
+    /**
+     * @throws RuntimeException
+     */
+    public function compiler(?bool $allowOptimizations = null): static
+    {
+        throw new RuntimeException('Cannot call compiler method at runtime.');
+    }
 
     public function __get(string $name)
     {

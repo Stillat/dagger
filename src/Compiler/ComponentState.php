@@ -6,6 +6,7 @@ use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\Dagger\Cache\CacheProperties;
+use Stillat\Dagger\ComponentOptions;
 use Stillat\Dagger\Support\Utils;
 
 class ComponentState
@@ -63,7 +64,20 @@ class ComponentState
 
     public string $validationMessages = '[]';
 
+    public ?bool $canCompileTimeRender = null;
+
     public int $lineOffset = 0;
+
+    public ?Extractions $extractions = null;
+
+    public ComponentOptions $options;
+
+    /**
+     * Indicates if the component is eligible for compile-time rendering.
+     *
+     * We will keep it false by default, and only enable this if needed.
+     */
+    public bool $isCtrEligible = false;
 
     public ?CacheProperties $cacheProperties = null;
 
@@ -71,7 +85,13 @@ class ComponentState
         public ?ComponentNode $node,
         public string $varSuffix,
     ) {
+        $this->options = new ComponentOptions;
         $this->updateNodeDetails($this->node, $this->varSuffix);
+    }
+
+    public function getDynamicVariables(): array
+    {
+        return $this->dynamicVariables;
     }
 
     /**
@@ -287,6 +307,11 @@ class ComponentState
         return $this;
     }
 
+    public function getAllPropNames(): array
+    {
+        return array_merge($this->getPropNames(), $this->getAwareVariables());
+    }
+
     public function getPropDefaults(): array
     {
         return $this->defaultPropValues;
@@ -340,6 +365,11 @@ class ComponentState
         $this->mixins = $classes;
 
         return $this;
+    }
+
+    public function hasMixins(): bool
+    {
+        return $this->mixins != '';
     }
 
     public function getMixins(): string

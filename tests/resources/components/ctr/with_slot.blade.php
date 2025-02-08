@@ -1,0 +1,1 @@
+With Slot: {{ $slot }}

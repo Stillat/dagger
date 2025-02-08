@@ -1,0 +1,1 @@
+{{ \Stillat\Dagger\Tests\CtrDisabledClass::methodTwo() }}
