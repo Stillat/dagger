@@ -357,7 +357,13 @@ final class TemplateCompiler
      */
     protected function compileNodes(array $nodes): string
     {
+        if (empty($nodes)) {
+            return '';
+        }
+
         $compiled = '';
+
+        $lastNodeIndex = $nodes[array_key_last($nodes)]->index;
 
         foreach ($nodes as $node) {
             if (! $node instanceof ComponentNode) {
@@ -402,7 +408,7 @@ final class TemplateCompiler
             }
 
             if ($node->tagName === 'compiler:template_end') {
-                if ($node->hasNextNode()) {
+                if ($node->index != $lastNodeIndex) {
                     throw SourceMapper::makeComponentCompilerException(
                         $node,
                         'Compiler component [compiler:template_end] must be the last component.',
@@ -708,10 +714,30 @@ PHP;
             ->onlyParseComponents()
             ->parseTemplate($template)
             ->toDocument()
-            ->getRootNodes()
+            ->getNodes()
             ->all();
 
-        return $this->compileNodes($nodes);
+        return $this->compileNodes($this->simplifyNodes($nodes));
+    }
+
+    protected function simplifyNodes(array $nodes): array
+    {
+        /** @var AbstractNode $node */
+        foreach ($nodes as $node) {
+            $node->setDocument(null);
+            $node->previousNode = $node->nextNode = null;
+            $node->structure = null;
+
+            if ($node instanceof ComponentNode) {
+                $node->namePosition = null;
+                $node->parameterContentPosition = null;
+            }
+        }
+
+        return collect($nodes)
+            ->where(fn (AbstractNode $node) => $node->parent == null)
+            ->values()
+            ->all();
     }
 
     protected function storeComponentBlock(string $value): string
