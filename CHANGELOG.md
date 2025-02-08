@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Adds compiler support for circular component references, like nested comment threads
+
 ## [v1.0.6](https://github.com/Stillat/dagger/compare/v1.0.5...v1.0.6) - 2025-01-31
 
 - Corrects an issue where Blade stack compilation results in array index errors
