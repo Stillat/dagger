@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Adds compiler support for circular component references, like nested comment threads
 - Adds a `#cache` compiler attribute, which may be used to cache the results of any Dagger component
 - Bumps the minimum Laravel version to `11.23`, for `Cache::flexible` support
 - Improves compilation of custom functions declared within a component's template
