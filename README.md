@@ -67,6 +67,7 @@ The main visual difference when working with Dagger components is the use of the
 - [Custom Component Paths and Namespaces](#custom-component-paths-and-namespaces)
   - [Blade Component Prefix](#blade-component-prefix)
 - [Compile Time Rendering](#compile-time-rendering)
+  - [Disabling Compile Time Rendering on a Component](#disabling-compile-time-rendering-on-a-component)
   - [Enabling/Disabling Optimizations on Classes or Methods](#enablingdisabling-optimizations-on-classes-or-methods)
   - [Notes on Compile Time Rendering](#notes-on-compile-time-rendering)
 - [The View Manifest](#the-view-manifest)
@@ -1347,6 +1348,25 @@ However, if we were to call our component like so, the compiler would not attemp
 ```blade
 <c-alert :$message />
 ```
+
+### Disabling Compile Time Rendering on a Component
+
+The CTR system should be transparent from a component author's point-of-view, however, if the rare event that you need to disable compiler optimizations, you may do so using the `compiler` helper method:
+
+```blade
+<!-- /resources/dagger/views/the_component.blade.php -->
+@php
+    \Stillat\Dagger\component()
+        ->props(['title'])
+        ->compiler(
+            allowOptimizations: false
+        );
+@endphp
+
+{{ $title }}
+```
+
+If you find yourself disabling optimizations on a component, please open a discussion or an issue with details on which behaviors led to that decision.
 
 ### Enabling/Disabling Optimizations on Classes or Methods
 
