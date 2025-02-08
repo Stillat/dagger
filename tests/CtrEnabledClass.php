@@ -2,10 +2,10 @@
 
 namespace Stillat\Dagger\Tests;
 
-use Stillat\Dagger\Ctr\DisableCtr;
-use Stillat\Dagger\Ctr\EnableCtr;
+use Stillat\Dagger\Compiler\DisableOptimization;
+use Stillat\Dagger\Compiler\EnableOptimization;
 
-#[EnableCtr]
+#[EnableOptimization]
 class CtrEnabledClass
 {
     public static function methodOne(): string
@@ -13,7 +13,7 @@ class CtrEnabledClass
         return 'Hello, world.';
     }
 
-    #[DisableCtr]
+    #[DisableOptimization]
     public static function methodTwo(): string
     {
         return 'Hello, world.';

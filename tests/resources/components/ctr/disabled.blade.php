@@ -2,7 +2,7 @@
     \Stillat\Dagger\component()
         ->props(['title'])
         ->compiler(
-            allowCtr: false
+            allowOptimizations: false
         );
 @endphp
 

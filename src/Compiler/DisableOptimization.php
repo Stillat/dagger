@@ -1,8 +1,8 @@
 <?php
 
-namespace Stillat\Dagger\Ctr;
+namespace Stillat\Dagger\Compiler;
 
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class DisableCtr {}
+class DisableOptimization {}

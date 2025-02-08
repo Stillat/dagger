@@ -100,7 +100,7 @@ abstract class AbstractComponent
     /**
      * @throws RuntimeException
      */
-    public function compiler(?bool $allowCtr = null): static
+    public function compiler(?bool $allowOptimizations = null): static
     {
         throw new RuntimeException('Cannot call compiler method at runtime.');
     }

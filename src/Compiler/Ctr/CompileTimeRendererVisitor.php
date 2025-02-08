@@ -1,6 +1,6 @@
 <?php
 
-namespace Stillat\Dagger\Ctr;
+namespace Stillat\Dagger\Compiler\Ctr;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
@@ -8,6 +8,8 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use Stillat\Dagger\Compiler\ComponentState;
+use Stillat\Dagger\Compiler\DisableOptimization;
+use Stillat\Dagger\Compiler\EnableOptimization;
 
 class CompileTimeRendererVisitor implements NodeVisitor
 {
@@ -178,10 +180,10 @@ class CompileTimeRendererVisitor implements NodeVisitor
     {
         /** @var \ReflectionAttribute $methodCtrAttribute */
         if ($methodCtrAttribute = $this->getCtrAttribute($method)) {
-            return $methodCtrAttribute->getName() == EnableCtr::class;
+            return $methodCtrAttribute->getName() == EnableOptimization::class;
         }
 
-        if ($this->getCtrAttribute($class)?->getName() == EnableCtr::class) {
+        if ($this->getCtrAttribute($class)?->getName() == EnableOptimization::class) {
             return true;
         }
 
@@ -190,13 +192,13 @@ class CompileTimeRendererVisitor implements NodeVisitor
 
     protected function getCtrAttribute($reflectedObject): ?ReflectionAttribute
     {
-        $ctrAllowed = $reflectedObject->getAttributes(EnableCtr::class);
+        $ctrAllowed = $reflectedObject->getAttributes(EnableOptimization::class);
 
         if (! empty($ctrAllowed)) {
             return $ctrAllowed[0];
         }
 
-        $ctrDisabled = $reflectedObject->getAttributes(DisableCtr::class);
+        $ctrDisabled = $reflectedObject->getAttributes(DisableOptimization::class);
 
         if (! empty($ctrDisabled)) {
             return $ctrDisabled[0];

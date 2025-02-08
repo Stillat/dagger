@@ -77,10 +77,10 @@ class Component extends AbstractComponent
         return $this;
     }
 
-    public function compiler(?bool $allowCtr = null): static
+    public function compiler(?bool $allowOptimizations = null): static
     {
         $this->options = new ComponentOptions;
-        $this->options->allowCtr = $allowCtr ?? $this->options->allowCtr;
+        $this->options->allowOptimizations = $allowOptimizations ?? $this->options->allowOptimizations;
 
         return $this;
     }

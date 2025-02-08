@@ -4,7 +4,7 @@ namespace Stillat\Dagger\Compiler\Concerns;
 
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use Stillat\Dagger\Ctr\CompileTimeRendererVisitor;
+use Stillat\Dagger\Compiler\Ctr\CompileTimeRendererVisitor;
 use Stillat\Dagger\Parser\PhpParser;
 
 trait ManagesComponentCtrState
@@ -44,7 +44,7 @@ trait ManagesComponentCtrState
 
     protected function checkForCtrEligibility(string $originalTemplate, string $compiledTemplate): void
     {
-        if (! $this->activeComponent->options->allowCtr) {
+        if (! $this->activeComponent->options->allowOptimizations) {
             $this->activeComponent->isCtrEligible = false;
 
             return;
