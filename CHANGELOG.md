@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Improves compilation of custom functions declared within a component's template
+
 ## [v1.0.6](https://github.com/Stillat/dagger/compare/v1.0.5...v1.0.6) - 2025-01-31
 
 - Corrects an issue where Blade stack compilation results in array index errors
