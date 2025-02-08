@@ -5,6 +5,7 @@ namespace Stillat\Dagger\Compiler;
 use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
+use Stillat\Dagger\Cache\CacheProperties;
 use Stillat\Dagger\Support\Utils;
 
 class ComponentState
@@ -63,6 +64,8 @@ class ComponentState
     public string $validationMessages = '[]';
 
     public int $lineOffset = 0;
+
+    public ?CacheProperties $cacheProperties = null;
 
     public function __construct(
         public ?ComponentNode $node,
