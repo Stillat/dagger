@@ -67,6 +67,8 @@ The main visual difference when working with Dagger components is the use of the
 - [Custom Component Paths and Namespaces](#custom-component-paths-and-namespaces)
   - [Blade Component Prefix](#blade-component-prefix)
 - [Compile Time Rendering](#compile-time-rendering)
+  - [Enabling/Disabling Optimizations on Classes or Methods](#enablingdisabling-optimizations-on-classes-or-methods)
+  - [Notes on Compile Time Renderering](#notes-on-compile-time-renderering)
 - [The View Manifest](#the-view-manifest)
 - [License](#license)
 
@@ -1345,6 +1347,85 @@ However, if we were to call our component like so, the compiler would not attemp
 ```blade
 <c-alert :$message />
 ```
+
+### Enabling/Disabling Optimizations on Classes or Methods
+
+The CTR system will aggressively disable itself whenever it detects static method calls within component templates. You may choose to mark these methods as safe using the `EnableOptimization` attribute:
+
+```php
+<?php
+
+namespace App;
+
+use Stillat\Dagger\Compiler\EnableOptimization;
+
+class MyAwesomeClass
+{
+
+    #[EnableOptimization]
+    public static function myHelper()
+    {
+
+    }
+
+}
+```
+
+You may also mark an entire class as safe for optimizations by applying the attribute to the class instead:
+
+```php
+<?php
+
+namespace App;
+
+use Stillat\Dagger\Compiler\EnableOptimization;
+
+#[EnableOptimization]
+class MyAwesomeClass
+{
+
+    public static function myHelper()
+    {
+
+    }
+
+}
+```
+
+If you'd like to *disable* optimizations on a class or method explicitly, you may use the `DisableOptimization` attribute instead.
+
+The following example would enable optimizations on the entire class but disable it on a specific method:
+
+```php
+<?php
+
+namespace App;
+
+use Stillat\Dagger\Compiler\DisableOptimization;
+use Stillat\Dagger\Compiler\EnableOptimization;
+
+#[EnableOptimization]
+class MyAwesomeClass
+{
+
+    public static function methodOne()
+    {
+        // Optimization allowed.
+    }
+
+    #[DisableOptimization]
+    public static function methodTwo()
+    {
+        // Optimization not allowed.
+    }
+
+}
+```
+
+### Notes on Compile Time Renderering
+
+- You should *never* attempt to force a component to render at compile time, outside of applying the `EnableOptimization` or `DisableOptimization` attributes to your own helper methods
+- If an exception is raised while rendering a component at compile time, CTR will be disabled for that component and the compiler will revert to normal behavior
 
 ## The View Manifest
 
