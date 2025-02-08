@@ -142,3 +142,35 @@ EXPECTED;
     $this->assertSame($expected, $this->render($template));
     $this->assertSame($expected, $this->render($template));
 });
+
+test('dynamic cache keys using interpolation', function () {
+    $template = <<<'BLADE'
+@for ($i = 0; $i < 5; $i++)
+<c-cache_attribute.basic
+    #cache.forever="cache-key-{{ $i }}"
+    title="The Title4"
+/>
+@endfor
+BLADE;
+
+    $expected = <<<'EXPECTED'
+Title: The Title4
+Var: 1
+
+Title: The Title4
+Var: 2
+
+Title: The Title4
+Var: 3
+
+Title: The Title4
+Var: 4
+
+Title: The Title4
+Var: 5
+EXPECTED;
+
+    $this->assertSame($expected, $this->render($template));
+    $this->assertSame($expected, $this->render($template));
+    $this->assertSame($expected, $this->render($template));
+});

@@ -40,7 +40,6 @@ trait CompilesCache
             $cacheProperties->duration = $now->diffInSeconds($expires);
         }
 
-        // TODO: INteroplated variables test.
         if ($cacheParam->type == ParameterType::DynamicVariable) {
             $cacheProperties->key = $cacheParam->value;
         } else {
