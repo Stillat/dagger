@@ -108,10 +108,6 @@ Dagger components are also interopable with Blade components, and will add thems
 
 This is due to the View Manifest. The Dagger compiler and runtime will store which component files were used to create the final output in a JSON file, which is later used for cache-invalidation. The Dagger compiler inlines component templates, which prevents typical file-based cache invalidation from working; the View Manifest solves that problem.
 
-### Are circular component hierarchies supported?
-
-A circular component hierarchy is one where Component A includes Component B, which might conditionally include Component A again. Because the compiler inlines components, circular components are not supported and may result in infinite loops.
-
 ### Why build all of this?
 
 Because I wanted to.
