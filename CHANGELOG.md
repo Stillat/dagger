@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Adds a `#cache` compiler attribute, which may be used to cache the results of any Dagger component
+- Bumps the minimum Laravel version to `11.23`, for `Cache::flexible` support
+
 ## [v1.0.6](https://github.com/Stillat/dagger/compare/v1.0.5...v1.0.6) - 2025-01-31
 
 - Corrects an issue where Blade stack compilation results in array index errors
