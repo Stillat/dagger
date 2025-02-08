@@ -68,7 +68,7 @@ The main visual difference when working with Dagger components is the use of the
   - [Blade Component Prefix](#blade-component-prefix)
 - [Compile Time Rendering](#compile-time-rendering)
   - [Enabling/Disabling Optimizations on Classes or Methods](#enablingdisabling-optimizations-on-classes-or-methods)
-  - [Notes on Compile Time Renderering](#notes-on-compile-time-renderering)
+  - [Notes on Compile Time Rendering](#notes-on-compile-time-rendering)
 - [The View Manifest](#the-view-manifest)
 - [License](#license)
 
@@ -1422,7 +1422,7 @@ class MyAwesomeClass
 }
 ```
 
-### Notes on Compile Time Renderering
+### Notes on Compile Time Rendering
 
 - You should *never* attempt to force a component to render at compile time, outside of applying the `EnableOptimization` or `DisableOptimization` attributes to your own helper methods
 - If an exception is raised while rendering a component at compile time, CTR will be disabled for that component and the compiler will revert to normal behavior
