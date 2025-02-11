@@ -16,7 +16,10 @@ trait CompilesForwardedAttributes
         $paramsToKeep = [];
 
         foreach ($node->parameters as $param) {
-            if ($this->isCacheParam($param)) {
+            if (Str::contains($node->content, '#each')) {
+                dd('hiasdasd', $param);
+            }
+            if ($this->isCacheParam($param) || Str::startsWith($param->materializedName, $this->compilerDirectiveParams)) {
                 $compilerParams[] = $param;
 
                 continue;

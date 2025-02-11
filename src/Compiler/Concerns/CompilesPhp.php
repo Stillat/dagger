@@ -32,6 +32,19 @@ trait CompilesPhp
         return '$__componentData = array_intersect_key($__componentData, $compiledPropNames);';
     }
 
+    protected function compileInjectedProps(): string
+    {
+        if (empty($this->activeComponent->injectedProps)) {
+            return '';
+        }
+        $componentDataVar = $this->activeComponent->componentDataVar();
+        $injections = implode($this->newlineStyle, $this->activeComponent->injectedProps);
+
+        return Str::swap([
+            'componentDataVar' => $componentDataVar,
+        ], $injections);
+    }
+
     protected function compileDefaultProps(): string
     {
         $varInitializers = [];
