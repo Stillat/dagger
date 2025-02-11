@@ -17,7 +17,6 @@ class ViewManifest
 
     public function __construct(string $cachePath)
     {
-        ray('CREATING NEW INSTANCE?!');
         $this->cachePath = $cachePath;
     }
 
