@@ -5,7 +5,7 @@ namespace Stillat\Dagger\Listeners;
 use Stillat\Dagger\Facades\Compiler;
 use Stillat\Dagger\Runtime\ViewManifest;
 
-class TerminatingListener
+class ResponsePreparedListener
 {
     protected ViewManifest $manifest;
 

@@ -3,7 +3,7 @@
 namespace Stillat\Dagger;
 
 use Illuminate\Contracts\View\Factory;
-use Illuminate\Foundation\Events\Terminating;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
@@ -13,7 +13,7 @@ use Stillat\Dagger\Compiler\BladeComponentStacksCompiler;
 use Stillat\Dagger\Compiler\TemplateCompiler;
 use Stillat\Dagger\Exceptions\Mapping\LineMapper;
 use Stillat\Dagger\Facades\Compiler;
-use Stillat\Dagger\Listeners\TerminatingListener;
+use Stillat\Dagger\Listeners\ResponsePreparedListener;
 use Stillat\Dagger\Listeners\ViewCreatingListener;
 use Stillat\Dagger\Runtime\ComponentEnvironment;
 use Stillat\Dagger\Runtime\ViewManifest;
@@ -84,7 +84,7 @@ class ServiceProvider extends IlluminateServiceProvider
 
     protected function bootEvents()
     {
-        Event::listen(Terminating::class, TerminatingListener::class);
+        Event::listen(ResponsePrepared::class, ResponsePreparedListener::class);
         view()->creator('*', ViewCreatingListener::class);
     }
 }
