@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.1](https://github.com/Stillat/dagger/compare/v1.1.0...v1.1.1) - 2025-02-10
+
+- Improves automatic cache invalidation and manifest lifecycle
+
 ## [v1.1.0](https://github.com/Stillat/dagger/compare/v1.0.6...v1.1.0) - 2025-02-08
 
 - Adds a new "Compile Time Rendering" system, which can render components at compile time and inline the static output
