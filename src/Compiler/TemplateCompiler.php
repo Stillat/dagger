@@ -62,7 +62,7 @@ final class TemplateCompiler
         '#style', '#def', '#group',
         '#styledef', '#classdef',
         '#cache', '#precomile',
-        '#for',
+        '#for', '#when'
     ];
 
     protected ReflectionMethod $storeRawBlockProxy;

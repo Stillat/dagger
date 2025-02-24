@@ -89,6 +89,18 @@ PHP;
         return $temp;
     }
 
+    protected function compileWhenAttribute(string $expression, string $compiledOutput): string
+    {
+        $whenAttribute = <<<'PHP'
+<?php if ($expression): ?>#compiled#<?php endif; ?>
+PHP;
+
+        return Str::swap([
+            '$expression' => $expression,
+            '#compiled#' => $compiledOutput,
+        ], $whenAttribute);
+    }
+
     protected function compileCompilerAttributes(string $compiledOutput): string
     {
         if (empty($this->activeComponent->compilerAttributes)) {
@@ -99,6 +111,13 @@ PHP;
             $compiledOutput = $this->compileForAttribute(
                 $this->activeComponent->compilerAttributes['for'],
                 $compiledOutput
+            );
+        }
+
+        if (isset($this->activeComponent->compilerAttributes['when'])) {
+            $compiledOutput = $this->compileWhenAttribute(
+                $this->activeComponent->compilerAttributes['when'],
+                $compiledOutput,
             );
         }
 
