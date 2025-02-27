@@ -17,6 +17,7 @@ class ResponsePreparedListener
     public function handle()
     {
         Compiler::cleanup();
+        ViewCreatingListener::clearCheckedViews();
 
         foreach ($this->manifest->getTracked() as $rootView => $tracked) {
             file_put_contents(
