@@ -181,7 +181,7 @@ final class TemplateCompiler
     /**
      * Replaces all raw placeholders within the provided string.
      */
-    protected function resolveBlocks(string $value): string
+    public function resolveBlocks(string $value): string
     {
         $placeholders = array_keys($this->componentBlocks);
 
@@ -742,7 +742,7 @@ PHP;
 
     protected function storeComponentBlock(string $value): string
     {
-        $placeholder = '__RAW::'.Utils::makeRandomString();
+        $placeholder = '__DAGGER_RAW::'.Utils::makeRandomString();
         $this->componentBlocks[$placeholder] = $value;
 
         return $placeholder;
