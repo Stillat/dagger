@@ -114,10 +114,35 @@ EXPECTED;
 });
 
 test('variables can be spread into component props using explicit syntax', function () {
-
     $template = <<<'BLADE'
 <ul>
     <c-for.item_spread #for.$items.item />
+</ul>
+BLADE;
+
+    $data = [
+        'items' => [
+            ['text' => 'Item 1', 'id' => 'test-id'], // The id should not leak as an extra attribute.
+            ['text' => 'Item 2', 'id' => 'test-id'], // The id should not leak as an extra attribute.
+        ],
+    ];
+
+    $expected = <<<'EXPECTED'
+<ul>
+    
+
+<li >Item 1</li>
+
+<li >Item 2</li></ul>
+EXPECTED;
+
+    $this->assertSame($expected, $this->render($template, $data));
+});
+
+test('values can be spread using the attribute syntax', function () {
+    $template = <<<'BLADE'
+<ul>
+    <c-for.item_spread #for="$items as ...$item" />
 </ul>
 BLADE;
 

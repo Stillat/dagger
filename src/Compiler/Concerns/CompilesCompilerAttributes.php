@@ -3,23 +3,33 @@
 namespace Stillat\Dagger\Compiler\Concerns;
 
 use Illuminate\Support\Str;
+use Stillat\BladeParser\Compiler\CompilerServices\LoopVariablesExtractor;
 use Stillat\Dagger\Support\Utils;
 
 trait CompilesCompilerAttributes
 {
-    protected function compileForAttribute(array $expression, string $compiledOutput): string
+    protected function compileForAttribute(string|array $expression, string $compiledOutput): string
     {
-        $loopExpression = $expression[0] ?? '';
-        $callback = trim($expression[1] ?? '');
-        $loopParts = explode('.', $loopExpression);
+        if (is_string($expression)) {
+            $loopVarExtractor = new LoopVariablesExtractor;
+            $extracted = $loopVarExtractor->extractDetails($expression);
+            $loopParts = [$extracted->variable, $extracted->alias];
+        } else {
+            $loopExpression = $expression[0] ?? '';
+            $loopParts = explode('.', $loopExpression);
+        }
+
         $spreadPropValues = false;
         $injectItem = false;
-
-        $callbackData = '';
 
         if (! isset($loopParts[1])) {
             $spreadPropValues = true;
             $loopParts[1] = '__value';
+        }
+
+        if (is_string($expression) && str_starts_with($loopParts[1], '...')) {
+            $spreadPropValues = true;
+            $loopParts[1] = mb_substr($loopParts[1], 4);
         }
 
         $variable = $loopParts[0];
@@ -37,17 +47,6 @@ trait CompilesCompilerAttributes
             $injectItem = true;
         }
 
-        if ($callback != '') {
-            $callbackStub = <<<'PHP'
-collect($varName)->mapWithKeys($callback)->all()
-PHP;
-
-            $callbackData = Str::swap([
-                '$varName' => $variable,
-                '$callback' => $callback,
-            ], $callbackStub);
-        }
-
         if ($injectItem) {
             $injectName = ltrim($loopParts[1], '$');
             $this->activeComponent->injectedProps[] = str_replace(
@@ -59,13 +58,13 @@ PHP;
             $varName = mb_substr($aliasValue, 1);
 
             $injection = <<<'PHP'
-foreach ($varName as $__key => $__tmp) {
-    if (! is_string($__key)) { continue; }
-    if (isset($compiledPropNames[$__key])) {
-        $componentDataVar[$__key] = $__tmp;
+foreach ($varName as $__daggerForKey => $__daggerForTmpValue) {
+    if (! is_string($__daggerForKey)) { continue; }
+    if (isset($compiledPropNames[$__daggerForKey])) {
+        $componentDataVar[$__daggerForKey] = $__daggerForTmpValue;
     }
 }
-unset($__tmp, $__key);
+unset($__daggerForTmpValue, $__daggerForKey);
 PHP;
 
             $this->activeComponent->injectedProps[] = str_replace('varName', $varName, $injection);
@@ -78,27 +77,20 @@ if (isset($__originalVarNameVarSuffix)) { $varName = $__originalVarNameVarSuffix
 ?>
 PHP;
 
-        $temp = Str::swap([
+        return Str::swap([
             'VarSuffix' => Utils::makeRandomString(),
             'VarName' => mb_substr($aliasValue, 1),
             '$varName' => $aliasValue,
-            '$data' => ($callbackData != '') ? $callbackData : $variable,
+            '$data' => $variable,
             '#compiled#' => $compiledOutput,
         ], $stub);
-
-        return $temp;
     }
 
     protected function compileWhenAttribute(string $expression, string $compiledOutput): string
     {
-        $whenAttribute = <<<'PHP'
-<?php if ($expression): ?>#compiled#<?php endif; ?>
+        return <<<PHP
+<?php if ($expression): ?>$compiledOutput<?php endif; ?>
 PHP;
-
-        return Str::swap([
-            '$expression' => $expression,
-            '#compiled#' => $compiledOutput,
-        ], $whenAttribute);
     }
 
     protected function compileCompilerAttributes(string $compiledOutput): string
