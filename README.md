@@ -30,6 +30,7 @@ The main visual difference when working with Dagger components is the use of the
 - [Component Syntax and the Component Builder](#component-syntax-and-the-component-builder)
   - [Slots](#slots)
     - [Named/Scoped Slots](#namedscoped-slots)
+    - [Checking if Slots Exist](#checking-if-slots-exist)
   - [Custom PHP When Using the Component Function](#custom-php-when-using-the-component-function)
   - [Calling Component Builder Methods](#calling-component-builder-methods)
   - [Renaming the Component Variable](#renaming-the-component-variable)
@@ -43,6 +44,7 @@ The main visual difference when working with Dagger components is the use of the
 - [Property Validation](#property-validation)
   - [Shorthand Validation Rules](#shorthand-validation-rules)
 - [Compiler Attributes](#compiler-attributes)
+  - [Conditionally Rendering Components](#conditionally-rendering-components)
   - [Escaping Compiler Attributes](#escaping-compiler-attributes)
 - [Caching Components](#caching-components)
   - [Dynamic Cache Keys](#dynamic-cache-keys)
@@ -283,7 +285,6 @@ Slot content may be specified like so:
 
 Dagger components also support named or *scoped* slots. Accessing scoped slots is done through the `$slots` variable, which is different from Blade components. This is done to help prevent collisions with variables that may have the same name as desireable slot names.
 
-
 Assuming the following component definition:
 
 ```blade
@@ -313,6 +314,24 @@ You may specify content for each slot like so:
     
     Default Slot Content
 </c-docs.namedslot>
+```
+
+#### Checking if Slots Exist
+
+You may use the `hasSlot` method to determine if the component has a named slot:
+
+```blade
+@if ($component->hasSlot('header'))
+    // The developer provided a named "header" slot.
+@endif
+```
+
+If you'd like to check if default slot content was provided you may use the `hasDefaultSlot()` methoid:
+
+```blade
+@if ($component->hasDefaultSlot())
+    // The developer provided a named "header" slot.
+@endif
 ```
 
 ### Custom PHP When Using the Component Function
@@ -639,6 +658,24 @@ The Dagger compiler introduces the concept of "compiler attributes", which have 
 
 Compiler attribute values **must** be static and **cannot** contain PHP expressions or reference variables.
 
+### Conditionally Rendering Components
+
+You may conditionally render a component by adding the `#when` compiler attribute.
+
+For example, instead of the following:
+
+```blade
+@if ($account->is_past_due)
+    <c-banner ... />
+@endif
+```
+
+We can instead write:
+
+```blade
+<c-banner #when="$account->is_past_due" ... />
+```
+
 ### Escaping Compiler Attributes
 
 If you need to output an attribute beginning with `#`, you may escape compiler attributes by prefixing it with another `#` character:
@@ -649,18 +686,7 @@ If you need to output an attribute beginning with `#`, you may escape compiler a
 <c-nested.component ##id="the-escaped-id-attribute" />
 ```
 
-In general, you should avoid using props or attributes beginning with `#` as they are likely to be further developed upon and made available as an extension point, or may conflict with forwarded attributes. The following list of compiler attributes are currently in use, or are reserved for future internal use:
-
-- `#id`
-- `#name`
-- `#compiler`
-- `#style`
-- `#def`
-- `#group`
-- `#styledef`
-- `#classdef`
-- `#cache`
-- `#precompile`
+In general, you should avoid using props or attributes beginning with `#` as they are likely to be further developed upon and made available as an extension point, or may conflict with forwarded attributes.
 
 ## Caching Components
 
