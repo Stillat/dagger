@@ -181,6 +181,11 @@ final class TemplateCompiler
         return $this->compilerDepth === 0;
     }
 
+    public function getComponentBlocks(): array
+    {
+        return $this->componentBlocks;
+    }
+
     /**
      * Replaces all raw placeholders within the provided string.
      */

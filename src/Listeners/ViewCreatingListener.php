@@ -46,9 +46,15 @@ class ViewCreatingListener
             return;
         }
 
+        $contents = file_get_contents($path);
+
+        if (! Str::contains($contents, array_keys(Compiler::getComponentBlocks()))) {
+            return;
+        }
+
         file_put_contents(
             $path,
-            Compiler::resolveBlocks(file_get_contents($path))
+            Compiler::resolveBlocks($contents)
         );
     }
 

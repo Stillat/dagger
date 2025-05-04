@@ -18,6 +18,7 @@ use Stillat\Dagger\Compiler\TemplateCompiler;
  * @method static CompilerOptions getOptions()
  * @method static resolveBlocks(string $value): string
  * @method static cleanup()
+ * @method static array getComponentBlocks()
  */
 class Compiler extends Facade
 {
