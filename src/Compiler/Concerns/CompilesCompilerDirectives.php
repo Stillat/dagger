@@ -69,6 +69,9 @@ PHP;
             if ($this->processCompileIfVar($line, $newLines)) {
                 continue;
             }
+            if ($this->processCompilePlaceholder($line, '/** COMPILE:INJECTED_PROPS', fn () => $this->compileInjectedProps(), $newLines)) {
+                continue;
+            }
             if ($this->processCompilePlaceholder($line, '/** COMPILE:PROPS_DEFAULT', fn () => $this->compileDefaultProps(), $newLines)) {
                 continue;
             }

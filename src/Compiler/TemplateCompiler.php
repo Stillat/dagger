@@ -16,6 +16,7 @@ use Stillat\BladeParser\Parser\DocumentParser;
 use Stillat\Dagger\Compiler\Concerns\AppliesCompilerParams;
 use Stillat\Dagger\Compiler\Concerns\CompilesBasicComponents;
 use Stillat\Dagger\Compiler\Concerns\CompilesCache;
+use Stillat\Dagger\Compiler\Concerns\CompilesCompilerAttributes;
 use Stillat\Dagger\Compiler\Concerns\CompilesCompilerDirectives;
 use Stillat\Dagger\Compiler\Concerns\CompilesComponentDetails;
 use Stillat\Dagger\Compiler\Concerns\CompilesDynamicComponents;
@@ -45,6 +46,7 @@ final class TemplateCompiler
     use AppliesCompilerParams,
         CompilesBasicComponents,
         CompilesCache,
+        CompilesCompilerAttributes,
         CompilesCompilerDirectives,
         CompilesComponentDetails,
         CompilesDynamicComponents,
@@ -60,6 +62,7 @@ final class TemplateCompiler
         '#style', '#def', '#group',
         '#styledef', '#classdef',
         '#cache', '#precomile',
+        '#for', '#when',
     ];
 
     protected ReflectionMethod $storeRawBlockProxy;
@@ -178,6 +181,11 @@ final class TemplateCompiler
         return $this->compilerDepth === 0;
     }
 
+    public function getComponentBlocks(): array
+    {
+        return $this->componentBlocks;
+    }
+
     /**
      * Replaces all raw placeholders within the provided string.
      */
@@ -273,6 +281,8 @@ final class TemplateCompiler
 
     protected function stopCompilingComponent(): void
     {
+        $this->activeComponent->injectedProps = [];
+
         array_pop($this->componentStack);
         array_pop($this->componentPath);
         array_pop($this->activeComponentNames);
@@ -489,6 +499,7 @@ final class TemplateCompiler
 <?php
 try {
 $__componentData = \Stillat\Dagger\Runtime\Attributes::mergeNestedAttributes($compiledParams, $compiledPropNames);
+/** COMPILE:INJECTED_PROPS */
 /** COMPILE:PROPS_DEFAULT */
 /** COMPILE_IF_VAR:componentGlobalScope $targetVar = get_defined_vars(); */
 $__slotContainerVarSuffix = new \Stillat\Dagger\Runtime\SlotContainer;
@@ -585,6 +596,7 @@ PHP;
                 $this->activeComponent->getGlobalScopeVariableName();
             }
 
+            $compiledComponentTemplate = $this->compileCompilerAttributes($compiledComponentTemplate);
             $compiledComponentTemplate = $this->compileCompilerDirectives($compiledComponentTemplate);
 
             $propNames = array_flip($componentModel->getAllPropNames());

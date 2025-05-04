@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.3.0]
+
+- Adds support for the `#when` compiler attribute to conditionally render Dagger components
+- Adds support for the `#for` compiler attribute to render a component for each item in a list
+- Improves internal compiler hot reloading behavior when using tools such as Vite
+- Adds a new `hasSlot` helper method to components
+- Adds a new `hasDefaultSlot` helper method to components
+
 ## [v1.2.0](https://github.com/Stillat/dagger/compare/v1.1.1...v1.2.0) - 2025-02-23
 
 - Enable installation in Laravel 12 projects

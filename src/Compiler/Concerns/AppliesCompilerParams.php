@@ -2,6 +2,7 @@
 
 namespace Stillat\Dagger\Compiler\Concerns;
 
+use Illuminate\Support\Str;
 use Stillat\BladeParser\Nodes\Components\ParameterNode;
 use Stillat\BladeParser\Nodes\Components\ParameterType;
 use Stillat\Dagger\Compiler\ComponentState;
@@ -57,8 +58,22 @@ trait AppliesCompilerParams
                     throw new InvalidCompilerParameterException;
                 }
 
-                return [mb_substr($param->name, 1) => $param->value];
+                $name = mb_substr($param->name, 1);
+                $value = $param->value;
+
+                if (Str::contains($name, '.')) {
+                    $extra = Str::after($name, '.');
+                    $name = Str::before($name, '.');
+                    $value = [
+                        $extra,
+                        $value,
+                    ];
+                }
+
+                return [$name => $value];
             })->all();
+
+        $component->compilerAttributes = $compilerParams;
 
         if (isset($compilerParams['id'])) {
             $component->compilerId = '#'.$compilerParams['id'];

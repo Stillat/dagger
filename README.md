@@ -30,6 +30,7 @@ The main visual difference when working with Dagger components is the use of the
 - [Component Syntax and the Component Builder](#component-syntax-and-the-component-builder)
   - [Slots](#slots)
     - [Named/Scoped Slots](#namedscoped-slots)
+    - [Checking if Slots Exist](#checking-if-slots-exist)
   - [Custom PHP When Using the Component Function](#custom-php-when-using-the-component-function)
   - [Calling Component Builder Methods](#calling-component-builder-methods)
   - [Renaming the Component Variable](#renaming-the-component-variable)
@@ -44,6 +45,10 @@ The main visual difference when working with Dagger components is the use of the
   - [Shorthand Validation Rules](#shorthand-validation-rules)
 - [Compiler Attributes](#compiler-attributes)
   - [Escaping Compiler Attributes](#escaping-compiler-attributes)
+- [Conditionally Rendering Components](#conditionally-rendering-components)
+- [Rendering Components for Each Item in a List](#rendering-components-for-each-item-in-a-list)
+  - [Automatically Inserting Prop Values](#automatically-inserting-prop-values)
+  - [Inserting the Array Element as a Prop](#inserting-the-array-element-as-a-prop)
 - [Caching Components](#caching-components)
   - [Dynamic Cache Keys](#dynamic-cache-keys)
   - [Specifying the Cache Store](#specifying-the-cache-store)
@@ -283,7 +288,6 @@ Slot content may be specified like so:
 
 Dagger components also support named or *scoped* slots. Accessing scoped slots is done through the `$slots` variable, which is different from Blade components. This is done to help prevent collisions with variables that may have the same name as desireable slot names.
 
-
 Assuming the following component definition:
 
 ```blade
@@ -313,6 +317,24 @@ You may specify content for each slot like so:
     
     Default Slot Content
 </c-docs.namedslot>
+```
+
+#### Checking if Slots Exist
+
+You may use the `hasSlot` method to determine if the component has a named slot:
+
+```blade
+@if ($component->hasSlot('header'))
+    // The developer provided a named "header" slot.
+@endif
+```
+
+If you'd like to check if default slot content was provided you may use the `hasDefaultSlot()` methoid:
+
+```blade
+@if ($component->hasDefaultSlot())
+    // The developer provided a named "header" slot.
+@endif
 ```
 
 ### Custom PHP When Using the Component Function
@@ -649,18 +671,112 @@ If you need to output an attribute beginning with `#`, you may escape compiler a
 <c-nested.component ##id="the-escaped-id-attribute" />
 ```
 
-In general, you should avoid using props or attributes beginning with `#` as they are likely to be further developed upon and made available as an extension point, or may conflict with forwarded attributes. The following list of compiler attributes are currently in use, or are reserved for future internal use:
+In general, you should avoid using props or attributes beginning with `#` as they are likely to be further developed upon and made available as an extension point, or may conflict with forwarded attributes.
 
-- `#id`
-- `#name`
-- `#compiler`
-- `#style`
-- `#def`
-- `#group`
-- `#styledef`
-- `#classdef`
-- `#cache`
-- `#precompile`
+## Conditionally Rendering Components
+
+You may conditionally render a component by adding the `#when` compiler attribute.
+
+For example, instead of the following:
+
+```blade
+@if ($account->is_past_due)
+    <c-banner ... />
+@endif
+```
+
+We can instead write:
+
+```blade
+<c-banner #when="$account->is_past_due" ... />
+```
+
+## Rendering Components for Each Item in a List
+
+Dagger provides a `#for` compiler attribute that may be used to render a component for each item in a list.
+
+Imagine we have the following array of people:
+
+```php
+$people = [
+    [
+        'name' => 'Alice',
+        'age'  => 32,
+    ],
+    [
+        'name' => 'Bob',
+        'age'  => 35,
+    ],
+    [
+        'name' => 'Charlie',
+        'age'  => 29,
+    ],
+];
+```
+
+and this component:
+
+```blade
+@props(['name', 'age'])
+
+Hello, {{ $name }}! You are {{ $age }}.
+```
+
+If we wanted to render our component for each person in our `$people` array, we would typically write a template like so:
+
+```blade
+@foreach ($people as $person)
+    <c-profile
+        :name="$person['name']"
+        :age="$person['age']"
+    />
+@endforeach
+```
+
+We can simplify this using the `#for` compiler attribute. This attribute accepts the name of the variable to iterate as the first modifier, and the name of the variable to assign each element to as the second modifier:
+
+```blade
+<c-profile
+    #for.people.person
+    :name="$person['name']"
+    :age="$person['age']"
+/>
+```
+
+### Automatically Inserting Prop Values
+
+We can simplify our example even further by allowing the compiler to automatically add any array elements that overlap with our component's props. To do this, we simply omit the variable name:
+
+```blade
+<c-profile #for.people />
+```
+
+Since our array of people contains `name` and `age` elements and our component defines those same props, they will be automatically inserted for us. It is important to note that any extra elements in the array will be ignored, and _not_ appear in the attribute bag.
+
+### Inserting the Array Element as a Prop
+
+If our component accepted a person element instead of a name and age separately:
+
+```blade
+@props(['person'])
+
+Hello, {{ $person['name'] }}! You are {{ $person['age'] }}.
+```
+
+Instead of writing the following:
+
+```blade
+<c-profile
+    #for.people.person
+    :$person
+/>
+```
+
+We could instead write the following to have the compiler automatically add the loop variable as a prop or attribute (note the leading `$`):
+
+```blade
+<c-profile #for.people.$person />
+```
 
 ## Caching Components
 

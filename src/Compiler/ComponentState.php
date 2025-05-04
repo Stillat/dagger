@@ -81,6 +81,10 @@ class ComponentState
 
     public ?CacheProperties $cacheProperties = null;
 
+    public array $compilerAttributes = [];
+
+    public array $injectedProps = [];
+
     public function __construct(
         public ?ComponentNode $node,
         public string $varSuffix,
