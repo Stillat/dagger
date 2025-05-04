@@ -133,6 +133,11 @@ class Component extends AbstractComponent
         return $this->slots->hasSlot($slotName);
     }
 
+    public function hasDefaultSlot(): bool
+    {
+        return $this->slots->hasDefaultSlotContent();
+    }
+
     public function __call($method, $parameters)
     {
         if (! isset($this->macros[$method])) {
