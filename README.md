@@ -44,8 +44,11 @@ The main visual difference when working with Dagger components is the use of the
 - [Property Validation](#property-validation)
   - [Shorthand Validation Rules](#shorthand-validation-rules)
 - [Compiler Attributes](#compiler-attributes)
-  - [Conditionally Rendering Components](#conditionally-rendering-components)
   - [Escaping Compiler Attributes](#escaping-compiler-attributes)
+- [Conditionally Rendering Components](#conditionally-rendering-components)
+- [Rendering Components for Each Item in a List](#rendering-components-for-each-item-in-a-list)
+  - [Automatically Inserting Prop Values](#automatically-inserting-prop-values)
+  - [Inserting the Array Element as a Prop](#inserting-the-array-element-as-a-prop)
 - [Caching Components](#caching-components)
   - [Dynamic Cache Keys](#dynamic-cache-keys)
   - [Specifying the Cache Store](#specifying-the-cache-store)
@@ -658,7 +661,19 @@ The Dagger compiler introduces the concept of "compiler attributes", which have 
 
 Compiler attribute values **must** be static and **cannot** contain PHP expressions or reference variables.
 
-### Conditionally Rendering Components
+### Escaping Compiler Attributes
+
+If you need to output an attribute beginning with `#`, you may escape compiler attributes by prefixing it with another `#` character:
+
+```blade
+<!-- /resources/dagger/views/component.blade.php -->
+
+<c-nested.component ##id="the-escaped-id-attribute" />
+```
+
+In general, you should avoid using props or attributes beginning with `#` as they are likely to be further developed upon and made available as an extension point, or may conflict with forwarded attributes.
+
+## Conditionally Rendering Components
 
 You may conditionally render a component by adding the `#when` compiler attribute.
 
@@ -676,17 +691,92 @@ We can instead write:
 <c-banner #when="$account->is_past_due" ... />
 ```
 
-### Escaping Compiler Attributes
+## Rendering Components for Each Item in a List
 
-If you need to output an attribute beginning with `#`, you may escape compiler attributes by prefixing it with another `#` character:
+Dagger provides a `#for` compiler attribute that may be used to render a component for each item in a list.
 
-```blade
-<!-- /resources/dagger/views/component.blade.php -->
+Imagine we have the following array of people:
 
-<c-nested.component ##id="the-escaped-id-attribute" />
+```php
+$people = [
+    [
+        'name' => 'Alice',
+        'age'  => 32,
+    ],
+    [
+        'name' => 'Bob',
+        'age'  => 35,
+    ],
+    [
+        'name' => 'Charlie',
+        'age'  => 29,
+    ],
+];
 ```
 
-In general, you should avoid using props or attributes beginning with `#` as they are likely to be further developed upon and made available as an extension point, or may conflict with forwarded attributes.
+and this component:
+
+```blade
+@props(['name', 'age'])
+
+Hello, {{ $name }}! You are {{ $age }}.
+```
+
+If we wanted to render our component for each person in our `$people` array, we would typically write a template like so:
+
+```blade
+@foreach ($people as $person)
+    <c-profile
+        :name="$person['name']"
+        :age="$person['age']"
+    />
+@endforeach
+```
+
+We can simplify this using the `#for` compiler attribute. This attribute accepts the name of the variable to iterate as the first modifier, and the name of the variable to assign each element to as the second modifier:
+
+```blade
+<c-profile
+    #for.people.person
+    :name="$person['name']"
+    :age="$person['age']"
+/>
+```
+
+### Automatically Inserting Prop Values
+
+We can simplify our example even further by allowing the compiler to automatically add any array elements that overlap with our component's props. To do this, we simply omit the variable name:
+
+```blade
+<c-profile #for.people />
+```
+
+Since our array of people contains `name` and `age` elements and our component defines those same props, they will be automatically inserted for us. It is important to note that any extra elements in the array will be ignored, and _not_ appear in the attribute bag.
+
+### Inserting the Array Element as a Prop
+
+If our component accepted a person element instead of a name and age separately:
+
+```blade
+@props(['person'])
+
+Hello, {{ $person['name'] }}! You are {{ $person['age'] }}.
+```
+
+Instead of writing the following:
+
+```blade
+<c-profile
+    #for.people.person
+    :$person
+/>
+```
+
+We could instead write the following to have the compiler automatically add the loop variable as a prop or attribute (note the leading `$`):
+
+```blade
+<c-profile #for.people.$person />
+```
 
 ## Caching Components
 
