@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.3.0]
+## [v1.3.0](https://github.com/Stillat/dagger/compare/v1.2.0...v1.3.0) - 2025-05-04
 
 - Adds support for the `#when` compiler attribute to conditionally render Dagger components
 - Adds support for the `#for` compiler attribute to render a component for each item in a list
