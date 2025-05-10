@@ -583,15 +583,6 @@ PHP;
                 throw SourceMapper::convertParserError($error, $innerTemplate, $sourcePath, $componentModel->lineOffset);
             }
 
-            if (count($this->componentCompiler->getRenders()) > 0) {
-                foreach ($this->componentCompiler->getRenders() as $render) {
-                    $placeholder = $render['placeholder'];
-                    $phpNode = $render['node'];
-
-                    $this->activeComponent->cacheReplacements[$placeholder] = '<?php echo '.$this->printPhpAst($phpNode).'; ?>';
-                }
-            }
-
             if (count($this->activeComponent->cacheReplacements) > 0) {
                 $this->activeComponent->getGlobalScopeVariableName();
             }

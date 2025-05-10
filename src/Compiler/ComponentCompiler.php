@@ -5,7 +5,6 @@ namespace Stillat\Dagger\Compiler;
 use Illuminate\Pipeline\Pipeline;
 use PhpParser\PrettyPrinter;
 use PhpParser\PrettyPrinter\Standard;
-use Stillat\Dagger\Compiler\ComponentStages\ExtractsRenderCalls;
 use Stillat\Dagger\Compiler\ComponentStages\RemoveUseStatements;
 use Stillat\Dagger\Compiler\ComponentStages\ResolveNamespaces;
 use Stillat\Dagger\Compiler\ComponentStages\RewriteFunctions;
@@ -23,18 +22,6 @@ class ComponentCompiler
         $this->printer = new Standard;
     }
 
-    protected array $renders = [];
-
-    public function setRenders(array $renders): void
-    {
-        $this->renders = $renders;
-    }
-
-    public function getRenders(): array
-    {
-        return $this->renders;
-    }
-
     public function compile(string $component): string
     {
         $ast = app(Pipeline::class)
@@ -42,7 +29,6 @@ class ComponentCompiler
             ->through([
                 ResolveNamespaces::class,
                 RemoveUseStatements::class,
-                new ExtractsRenderCalls($this),
                 RewriteFunctions::class,
             ])
             ->thenReturn();
