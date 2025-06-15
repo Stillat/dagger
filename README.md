@@ -1702,7 +1702,6 @@ This is useful if you would like to wrap the compiled output and not have to man
 You may use wildcards when registering your compiler callbacks:
 
 ```php
-```php
 <?php
 
 use Illuminate\Support\Str;
