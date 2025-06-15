@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it applies mixin data', function () {
     $this->assertSame(
         'Value from mixin one',

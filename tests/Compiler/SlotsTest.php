@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Str;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('default slot scope behavior is equivalent to blade components', function () {
     $bladeComponent = <<<'BLADE'

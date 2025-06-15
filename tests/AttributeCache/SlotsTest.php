@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Str;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('it replaces basic slot content', function () {
     $template = <<<'BLADE'

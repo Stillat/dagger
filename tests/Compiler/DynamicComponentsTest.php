@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Str;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('it renders dynamic components', function () {
     $template = <<<'BLADE'

@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('forwarded named slots can be cached within dynamic components', function () {
     $template = <<<'BLADE'
 @for ($i = 0; $i < 3; $i++)

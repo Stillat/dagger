@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('custom namespaces can be registered', function () {
     $this->assertSame(
         '<b-test />',

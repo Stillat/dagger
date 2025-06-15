@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it trims dynamic output', function () {
     $template = <<<'BLADE'
 <c-output.dynamic_trim />

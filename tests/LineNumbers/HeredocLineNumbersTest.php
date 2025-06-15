@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it doesnt add line numbers to end of heredoc', function () {
     $template = <<<'PHP'
 

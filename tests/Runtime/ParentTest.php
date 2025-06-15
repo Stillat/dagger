@@ -1,7 +1,5 @@
 <?php
 
-uses(\Stillat\Dagger\Tests\CompilerTestCase::class);
-
 test('Blade components can be a parent', function () {
     $expected = <<<'EXPECTED'
 Using class properties:

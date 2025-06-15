@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it renders attributes', function () {
     $this->assertSame(
         'class="one two three" No Prop',

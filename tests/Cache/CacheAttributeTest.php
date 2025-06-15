@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('basic cache attribute', function () {
     $template = <<<'BLADE'
 @for ($i = 0; $i < 5; $i++)

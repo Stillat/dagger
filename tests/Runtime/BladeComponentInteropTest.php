@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Str;
 
-uses(\Stillat\Dagger\Tests\CompilerTestCase::class);
-
 test('it compiles content inside Blade component slots', function () {
     $template = <<<'BLADE'
 <x-alert>

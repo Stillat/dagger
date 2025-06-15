@@ -1,9 +1,6 @@
 <?php
 
 use Stillat\Dagger\Cache\CacheAttributeParser;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('it parses cache details', function ($cacheString, $results) {
     $attributeParser = new CacheAttributeParser;

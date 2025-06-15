@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it parses props directive', function () {
     $template = <<<'BLADE'
 <c-properties.basic title="The Title" class="some class names here" />
