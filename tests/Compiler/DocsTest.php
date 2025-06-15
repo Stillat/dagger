@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('alert example', function () {
     $template = <<<'BLADE'
 <c-docs.alert type="error" :message="$message" class="mb-4"/>

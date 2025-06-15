@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('invalid props triggers exception', function () {
     $this->expectExceptionMessage('The title property is required.');
     $this->render('<c-validation.basic />');

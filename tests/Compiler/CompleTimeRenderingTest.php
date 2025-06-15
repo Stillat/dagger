@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('simple components can be rendered at compile time', function () {
     $this->assertSame(
         '<button>Book Room</button>',

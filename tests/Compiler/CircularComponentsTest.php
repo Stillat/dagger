@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it compiles circular component references', function () {
     $comments = [
         ['message' => 'Message 1'],

@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Str;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('default stencil content is rendered if not changed', function () {
     $this->assertSame(

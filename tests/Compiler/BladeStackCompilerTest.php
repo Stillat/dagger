@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it does not trigger errors if it cannot find ending string', function () {
     $input = <<<'PHP'
 @props([

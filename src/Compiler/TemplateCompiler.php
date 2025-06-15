@@ -24,6 +24,7 @@ use Stillat\Dagger\Compiler\Concerns\CompilesForwardedAttributes;
 use Stillat\Dagger\Compiler\Concerns\CompilesPhp;
 use Stillat\Dagger\Compiler\Concerns\CompilesSlots;
 use Stillat\Dagger\Compiler\Concerns\CompilesStencils;
+use Stillat\Dagger\Compiler\Concerns\ManagesComponentCompilerCallbacks;
 use Stillat\Dagger\Compiler\Concerns\ManagesComponentCtrState;
 use Stillat\Dagger\Compiler\Concerns\ManagesExceptions;
 use Stillat\Dagger\Exceptions\CompilerException;
@@ -54,6 +55,7 @@ final class TemplateCompiler
         CompilesPhp,
         CompilesSlots,
         CompilesStencils,
+        ManagesComponentCompilerCallbacks,
         ManagesComponentCtrState,
         ManagesExceptions;
 
@@ -400,6 +402,12 @@ final class TemplateCompiler
 
             $currentView = $this->manifest->last();
             $currentViewPath = $currentView?->getPath();
+
+            if ($callbackResult = $this->compileComponentCallback($node)) {
+                $compiled .= $callbackResult;
+
+                continue;
+            }
 
             if ($this->isDynamicComponent($node)) {
                 $compiled .= $this->compileDynamicComponentScaffolding($node, $currentViewPath ?? '');

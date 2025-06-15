@@ -1,7 +1,5 @@
 <?php
 
-uses(\Stillat\Dagger\Tests\CompilerTestCase::class);
-
 test('it retrieves depth using component parent', function () {
     $this->assertSame(
         'Depth: 1',

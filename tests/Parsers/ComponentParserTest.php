@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it parses basic component props directive', function () {
     $template = <<<'BLADE'
 @props(['title', 'type'])

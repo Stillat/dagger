@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('dynamic named slot variables bust the cache within dynamic components', function () {
     $template = <<<'BLADE'
 @for ($i = 0; $i < 2; $i++)

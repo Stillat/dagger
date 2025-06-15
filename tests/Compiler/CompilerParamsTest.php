@@ -1,9 +1,6 @@
 <?php
 
 use Stillat\Dagger\Exceptions\InvalidCompilerParameterException;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('it throws an exception when using variable references', function () {
     $this->expectException(InvalidCompilerParameterException::class);

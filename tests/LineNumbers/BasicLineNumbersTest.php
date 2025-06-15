@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it inserts line numbers within basic php', function () {
     $template = <<<'EOT'
 <?php

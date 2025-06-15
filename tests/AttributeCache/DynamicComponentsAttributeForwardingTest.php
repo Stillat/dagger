@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('forwarded attributes can be cached inside dynamic components', function () {
     $template = <<<'BLADE'
 <c-dynamic-component component="cache.root" #inner:title="The Title" />

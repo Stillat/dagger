@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('render function is evaluated for each invocation', function () {
     $template = <<<'BLADE'
 @for ($i = 0; $i < 10; $i++)

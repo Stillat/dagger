@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('for attribute is compiled', function () {
     $template = <<<'BLADE'
 <ul>

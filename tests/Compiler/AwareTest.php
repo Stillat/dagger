@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('aware can retrieve default prop value from parent', function () {
     $this->assertSame(
         'Root Default!',

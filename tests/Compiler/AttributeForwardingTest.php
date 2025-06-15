@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Str;
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
 
 test('parameters can be forwarded', function () {
     $template = <<<'BLADE'

@@ -1,9 +1,5 @@
 <?php
 
-use Stillat\Dagger\Tests\CompilerTestCase;
-
-uses(CompilerTestCase::class);
-
 test('it compiles simple static content', function () {
     $this->assertSame(
         'Some Static Content {{ title }}',
