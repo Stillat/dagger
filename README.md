@@ -79,6 +79,9 @@ The main visual difference when working with Dagger components is the use of the
   - [Disabling Compile Time Rendering on a Component](#disabling-compile-time-rendering-on-a-component)
   - [Enabling/Disabling Optimizations on Classes or Methods](#enablingdisabling-optimizations-on-classes-or-methods)
   - [Notes on Compile Time Rendering](#notes-on-compile-time-rendering)
+- [Component Compiler Callbacks](#component-compiler-callbacks)
+  - [Hanling Inner Content](#handling-inner-content)
+  - [Wildcard Component Patterns](#wildcard-component-patterns)
 - [The View Manifest](#the-view-manifest)
 - [License](#license)
 
@@ -1653,6 +1656,72 @@ class MyAwesomeClass
 
 - You should *never* attempt to force a component to render at compile time, outside of applying the `EnableOptimization` or `DisableOptimization` attributes to your own helper methods
 - If an exception is raised while rendering a component at compile time, CTR will be disabled for that component and the compiler will revert to normal behavior
+
+## Component Compiler Callbacks
+
+There are times you way wish to compile a component *without* a corresponding view file, similar to a directive. This can be accomplished by registering your custom component compiler callback using the `Compiler::compileComponent` method:
+
+```php
+<?php
+
+use Stillat\Dagger\Facades\Compiler;
+
+Compiler::compileComponent('c:mycomponent', function ($node) {
+    return 'My Component';
+});
+
+```
+
+Whenever the `<c-mycomponent />` component is compiled our custom callback will be invoked and that used as the compiled output.
+
+### Handling Inner Content
+
+For component tag pairs, the template compiler will provide the pre-compiled inner content as the second argument to the callback:
+
+```php
+<?php
+
+use Stillat\Dagger\Facades\Compiler;
+
+Compiler::compileComponent('c:mycomponent', function ($node, $innerContent) {
+    return '<div class="simple-wrapper">'.$innerContent.'</div>';
+});
+
+```
+
+This is useful if you would like to wrap the compiled output and not have to manage compiling the inner content yourself:
+
+```blade
+<c-mycomponent>
+    <x-alert title="Other Components" />
+</c-mycomponent>
+```
+
+### Wildcard Component Patterns
+
+You may use wildcards when registering your compiler callbacks:
+
+```php
+```php
+<?php
+
+use Illuminate\Support\Str;
+use Stillat\Dagger\Facades\Compiler;
+
+Compiler::compileComponent('c:stack:*', function ($node) {
+    $stackName = Str::after($node->tagName, ':');
+    
+    // ...
+});
+
+```
+
+Our callback would now be invoked for all of the following:
+
+```blade
+<s-stack:styles />
+<c-stack:scripts />
+```
 
 ## The View Manifest
 

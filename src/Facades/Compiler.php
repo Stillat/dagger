@@ -2,6 +2,7 @@
 
 namespace Stillat\Dagger\Facades;
 
+use Closure;
 use Illuminate\Support\Facades\Facade;
 use Stillat\Dagger\Compiler\CompilerOptions;
 use Stillat\Dagger\Compiler\TemplateCompiler;
@@ -11,6 +12,8 @@ use Stillat\Dagger\Compiler\TemplateCompiler;
  * @method static void addComponentPath(string $namespace, string $path)
  * @method static void registerComponentPath(string $componentPrefix, string $path, ?string $namespace = null)
  * @method static string compile(string $template)
+ * @method static TemplateCompiler compileComponent(string $component, Closure $callback)
+ * @method static TemplateCompiler compileComponentWithPrefix(string $prefix, string $component, Closure $callback)
  * @method static string compileWithLineNumbers(string $template)
  * @method static string getDynamicComponentPath(string $proxyName, string|null $componentName = null)
  * @method static bool compiledDynamicComponentExists(string $proxyName, string $componentName)
