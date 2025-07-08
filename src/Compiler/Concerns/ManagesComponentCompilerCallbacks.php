@@ -57,8 +57,6 @@ trait ManagesComponentCompilerCallbacks
                 continue;
             }
 
-            ray($pattern);
-
             return $callback->call(
                 $this,
                 $node,
