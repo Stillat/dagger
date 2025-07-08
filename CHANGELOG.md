@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.4.1](https://github.com/Stillat/dagger/compare/v1.4.0...v1.4.1) - 2025-07-07
+
+- Removes errant `ray()` call
+
 ## [v1.4.0](https://github.com/Stillat/dagger/compare/v1.3.1...v1.4.0) - 2025-06-15
 
 - Adds the ability to compile components using a callback function
