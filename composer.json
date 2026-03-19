@@ -18,7 +18,7 @@
         "laravel/framework": "^11.23 || ^12.0 || ^13.0",
         "stillat/blade-parser": "^1.10.3 || ^v2.0.0",
         "nikic/php-parser": "^5",
-        "symfony/var-exporter": "^6.0"
+        "symfony/var-exporter": "^6.0 || ^7 || ^8"
     },
     "require-dev": {
         "orchestra/testbench": "^9.2 || ^10.0 || ^11",
